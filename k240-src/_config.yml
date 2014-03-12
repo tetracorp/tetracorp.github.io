@@ -1,0 +1,7 @@
+name: Exploring K240
+markdown: kramdown
+pygments: true
+destination: ../k240
+kramdown:
+  input: GFM
+permalink: none
