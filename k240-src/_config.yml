@@ -1,7 +1,11 @@
 name: Exploring K240
-markdown: kramdown
+markdown: redcarpet
 pygments: true
 destination: ../k240
 kramdown:
   input: GFM
+  hard_wrap: false
+redcarpet:
+  extensions: ['tables', 'strikethrough', 'no_intra_emphasis', 'autolink']
 permalink: none
+
