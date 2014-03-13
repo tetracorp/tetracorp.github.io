@@ -3,9 +3,9 @@ layout: default
 title: Main Index
 ---
 
-  <h3>Articles</h3>
+  <h3>Game Mechanics</h3>
   <ul class="posts">
-    {% for post in site.posts %}
+    {% for post in site.categories.game-mechanics %}
       <li><a href="{{site.baseurl}}{{ post.url }}">{{ post.title }}</a></li>
     {% endfor %}
   </ul>
