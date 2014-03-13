@@ -47,7 +47,10 @@ explode due to random event.</p>
 <h3>Power failure</h3>
 
 <p>If there is insufficient power to supply all buildings, they fail in a
-specific order of preference.</p>
+specific order of preference, beginning with Asteroid Engines.</p>
+
+<p>When Gravity Nullifier switches off due to a power outage, it does not
+automatically switch itself back on when power is restored.</p>
 
 <h3>Air, food and water shortages</h3>
 
@@ -59,9 +62,25 @@ triggering &quot;resource deficiency&quot; and orange colour readout.</p>
 leaving the remaining colonists with no air/food/water. Those colonists
 without any food are killed at the following rate each day:</p>
 
-<p>| Air   | Kills all affected colonists                     | 
-| Food  | Kills 1/10 of affected colonists, plus one more  |
-| Water | Kills 1/5 of affected colonists, plus one more   |</p>
+<table><thead>
+<tr>
+<th>Resource</th>
+<th>Affected colonists killed per day</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Air</td>
+<td>Kills all affected colonists</td>
+</tr>
+<tr>
+<td>Food</td>
+<td>Kills 1/10 of affected colonists, plus one more</td>
+</tr>
+<tr>
+<td>Water</td>
+<td>Kills 1/5 of affected colonists, plus one more</td>
+</tr>
+</tbody></table>
 
 <p>Additionally, for each resource in the red, social unrest increases by +2
 points per day.</p>
