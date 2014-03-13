@@ -30,6 +30,7 @@ Each Radiation Filter reduces radiation by 30%.
 There is a percentage chance to lose a colonist each day, which
 increases based on the amount of radiation not negated by Radiation Filters
 or treated by Medical Centres.
+
 Radiation | Chance of losing one colonist
 ----------|------------------------------
        0% |   1%

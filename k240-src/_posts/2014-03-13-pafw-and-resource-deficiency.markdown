@@ -30,9 +30,9 @@ Red colour occurs when production is insufficient and there is no surplus,
 leaving the remaining colonists with no air/food/water. Those colonists
 without any food are killed at the following rate each day:
 
-Air   | Kills all affected colonists                     | 
-Food  | Kills 1/10 of affected colonists, plus one more  |
-Water | Kills 1/5 of affected colonists, plus one more   |
+| Air   | Kills all affected colonists                     | 
+| Food  | Kills 1/10 of affected colonists, plus one more  |
+| Water | Kills 1/5 of affected colonists, plus one more   |
 
 Additionally, for each resource in the red, social unrest increases by +2
 points per day.
