@@ -1,4 +1,5 @@
 name: Exploring K240
+baseurl: http://tetracorp.github.io/k240
 markdown: redcarpet
 pygments: true
 destination: ../k240
