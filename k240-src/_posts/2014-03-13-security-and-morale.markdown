@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Security and Morale"
-categories:
+categories: game-mechanics
 ---
 
 A colony requires one Security Centre for every 100 colonists

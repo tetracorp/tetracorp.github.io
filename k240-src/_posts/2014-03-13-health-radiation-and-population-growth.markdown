@@ -1,6 +1,7 @@
 ---
 layout: post
 title: "Health, Radiation and Population Growth"
+categories: game-mechanics
 ---
 
 ### Gaining and Losing Colonists
