@@ -31,10 +31,10 @@ either production or surplus, a colony gains 2 points of Unrest.
 | 200-299  | MAJOR CRIMINAL ACTIVITY. |
 | 300-310  | SECURITY ALERT!          |
 
-#### Asteroid Secure
+### Asteroid Secure
 No security breach events happen.
 
-#### Low Morale
+### Low Morale
 - Worker strike (50% chance): All mining, shipbuilding, and missile
 construction are reduced to 40% of normal speed. Command Centre is
 also affected. (No other buildings require workers.) Strike lasts
@@ -43,13 +43,13 @@ also affected. (No other buildings require workers.) Strike lasts
 enough money in general fund to cover the loss, the rest is taken
 from Building fund, Vehicle fund, etc, and so on.
 
-#### Social Unrest
+### Social Unrest
 - Theft (33% chance): 10,000 - 50,000 credits stolen.
 - Worker strike (33% chance): Workers strike for 30-99 days.
 - Desertion (33% chance): If there are at least 50 colonists,
 5-14 disappear from the colony.
 
-#### Major Criminal Activity
+### Major Criminal Activity
 - Theft (25% chance): 50,000 - 100,000 credits stolen.
 - Desertion (25% chance): 10-29 colonists disappear.
 - Missile stolen (25% chance): All units of a random missile are
@@ -65,7 +65,7 @@ lead you to lose Virus or Mega instead.
 Assault Fighter if any are available, otherwise a Scout Ship.
 If no Scout Ships are available, no ship will be stolen.
 
-#### Security Alert!
+### Security Alert!
 - Theft (20% chance): 100,000 - 500,000 credits stolen.
 - Desertion (20% chance): 10-29 colonists disappear.
 - Ship stolen (20% chance): Randomly lose one of the following
@@ -74,4 +74,4 @@ Scout Ship, Transporter.
 - Missile stolen (20% chance): Lose all units of a random missile.
 - Blueprint stolen! (20% chance): A random blueprint is deleted.
 Missing blueprints can be re-purchased as normal from Sci-Tek,
-but the consequences can be disastrous.
+but the consequences can be disastrous in the meantime.

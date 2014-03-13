@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="http://tetracorp.github.io/k240/stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://tetracorp.github.io/k240/stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://tetracorp.github.io/k240/stylesheets/print.css" media="print">
+
+    <title>Exploring K240: PAFW and Resource Deficiency</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>PAFW and Resource Deficiency</h1>
+        <h2>; Exploring K240, a disassembly project</h2>
+
+<!--
+        <section id="downloads">
+          <a href="https://github.com/tetracorp" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+-->
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+
+<h3>Powerplant quirks</h3>
+
+<p>The Powerplant does not work as described in the manual. Due to a bug,
+Asteros un-mined depletes at a rate of 1 per four days even if no
+Powerplants are built. It produces 32Mw as long as there is at least one
+un-mined Asteros, but cannot use mined ore from storage.</p>
+
+<p>It produces no power without Asteros. Although the manual claims the
+Powerplant produces 8MW/day, this appears to be a mis-reading of the
+game code. The C.P.U. produces 8MW/day.</p>
+
+<p>A random event can cause a Powerplant to explode, increasing a colony&#39;s
+radiation. Strangely, Asteroid Engines also produce radiation if they
+explode due to random event.</p>
+
+<h3>Power failure</h3>
+
+<p>If there is insufficient power to supply all buildings, they fail in a
+specific order of preference.</p>
+
+<h3>Air, food and water shortages</h3>
+
+<p>Each colonist needs one unit of air, food and water per day. If production
+is insufficient, the remaining colonists consume from stored surplus,
+triggering &quot;resource deficiency&quot; and orange colour readout.</p>
+
+<p>Red colour occurs when production is insufficient and there is no surplus,
+leaving the remaining colonists with no air/food/water. Those colonists
+without any food are killed at the following rate each day:</p>
+
+<p>Air   | Kills all affected colonists                     | 
+Food  | Kills 1/10 of affected colonists, plus one more  |
+Water | Kills 1/5 of affected colonists, plus one more   |</p>
+
+<p>Additionally, for each resource in the red, social unrest increases by +2
+points per day.</p>
+
+
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

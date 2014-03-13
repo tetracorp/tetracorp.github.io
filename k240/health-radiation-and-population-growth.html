@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="http://tetracorp.github.io/k240/stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://tetracorp.github.io/k240/stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="http://tetracorp.github.io/k240/stylesheets/print.css" media="print">
+
+    <title>Exploring K240: Health, Radiation and Population Growth</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>Health, Radiation and Population Growth</h1>
+        <h2>; Exploring K240, a disassembly project</h2>
+
+<!--
+        <section id="downloads">
+          <a href="https://github.com/tetracorp" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+-->
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+
+<h3>Gaining and Losing Colonists</h3>
+
+<p>Each colony has a 40% chance each day to gain a colonist. This is the
+only way to gain workers. Population size does not affect growth rate.</p>
+
+<p>Each colony has a 10% chance per day to lose one colonist. Colonists
+can also be lost due to food/air/water shortages, untreated radiation,
+virus outbreaks, certain alien bioweapons, desertion during civil unrest,
+and sudden housing shortages caused by housing being blown up.</p>
+
+<h3>Medical Centres</h3>
+
+<p>If the colony has one Medical Centre for every 100 colonists after the
+first 50, the outbreak ends. Otherwise, it loses two colonists per day.
+Medical Centres can end virus outbreaks even if the building is without
+power.</p>
+
+<p>Each Medical Centre decreases the negative effects of radiation by 10%.</p>
+
+<h3>Radiation</h3>
+
+<p>Each asteroid has a certain amount of radiation. Radiation increases
+by 10% for every 100 un-mined Asteros, and 10% for every 2 un-mined
+Nexos.</p>
+
+<p>Each Radiation Filter reduces radiation by 30%.</p>
+
+<p>There is a percentage chance to lose a colonist each day, which
+increases based on the amount of radiation not negated by Radiation Filters
+or treated by Medical Centres.
+Radiation | Chance of losing one colonist
+----------|------------------------------
+       0% |   1%
+      10% |  11%
+      20% |  12%
+      30% |  14%
+      40% |  15%
+      50% |  18%
+      60% |  21%
+      70% |  26%
+      80% |  34%
+      90% |  51%
+     100% | 100%</p>
+
+<h3>Rapidly Declining Population</h3>
+
+<p>The &quot;rapidly declining population&quot; warning triggers whenever a colony&#39;s
+population drops to 30 or lower. If a reason is given (i.e. lack of food,
+air or water), this means the colony is out of surplus in that resource and
+may be losing colonists quickly.</p>
+
+<p>If no reason is given, the most likely causes are radiation or certain
+alien population-reducing weapons.</p>
+
+
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>
