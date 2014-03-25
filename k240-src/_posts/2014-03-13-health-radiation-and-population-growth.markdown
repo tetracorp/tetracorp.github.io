@@ -12,8 +12,12 @@ Each colony has a 10% chance per day to lose one colonist. Colonists
 can also be lost due to food/air/water shortages, untreated radiation,
 virus outbreaks, certain alien bioweapons, desertion during civil unrest,
 and sudden housing shortages caused by housing being blown up.
+A colony with zero colonists left is automatically destroyed.
 
 ### Medical Centres
+Medical centres have exactly two uses: to stop virus outbreaks,
+and treat radiation sickness.
+
 If the colony has one Medical Centre for every 100 colonists after the
 first 50, the outbreak ends. Otherwise, it loses two colonists per day.
 Medical Centres can end virus outbreaks even if the building is without
@@ -24,7 +28,8 @@ Each Medical Centre decreases the negative effects of radiation by 10%.
 ### Radiation
 Each asteroid has a certain amount of radiation. Radiation increases
 by 10% for every 100 un-mined Asteros, and 10% for every 2 un-mined
-Nexos.
+Nexos. This is why it's possible to lose some Radiation Filters later
+and remain at 0% radiation.
 
 Each Radiation Filter reduces radiation by 30%.
 

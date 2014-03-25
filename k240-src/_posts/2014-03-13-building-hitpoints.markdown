@@ -9,7 +9,7 @@ building's cost, hit points, build time and height (for the purpose of
 building scaffold height and turret placement).
 
 | Building                       |  Cost  | HP | BT | Ht|
-| -------------------------------|--------|----|----|---|
+|--------------------------------|--------|----|----|---|
 | Living Quarters                |   1000 |  5 | 32 | 0 |
 | Power Store                    |   1500 | 34 | 32 | 0 |
 | Storage Facility               |   1500 | 24 | 20 | 0 |
