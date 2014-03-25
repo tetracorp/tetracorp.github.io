@@ -35,11 +35,13 @@ asteroid you own, plus 2 CR per day for each colonist. This becomes a
 vital source of income in late game.
 
 Certain undocumented events grant valuable bonuses:
+
 - Destroy alien ship #42: 5,000 CR
 - Destroy alien ship #43: 10,000 CR
 - LOADSADOSH cheat: 100,000 CR
 
 Many events grant useful bonuses:
+
 - Scout reports finding &lt;n&gt; asteroids: 5,000 CR per asteroid
 - Sensors discover an asteroid: 5,000 CR
 - Sensors discover an alien asteroid: 10,000 CR
