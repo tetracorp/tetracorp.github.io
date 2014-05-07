@@ -26,16 +26,18 @@ power.
 Each Medical Centre decreases the negative effects of radiation by 10%.
 
 ### Radiation
-Each asteroid has a certain amount of radiation. Radiation increases
-by 10% for every 100 un-mined Asteros, and 10% for every 2 un-mined
-Nexos. This is why it's possible to lose some Radiation Filters later
-and remain at 0% radiation.
+An asteroid's radiation level increases
+by 10% for every 100 un-mined Asteros, for every 2 un-mined
+Traxium, and for every 1 un-mined Nexos. This is why it's possible to
+lose or demolish some Radiation Filters later and remain at 0% radiation:
+the ore that was causing part of the radiation has been mined out.
+Radiation can also be increased by certain weapons and random events.
 
-Each Radiation Filter reduces radiation by 30%.
+Each active Radiation Filter reduces radiation by 30%.
 
-There is a percentage chance to lose a colonist each day, which
-increases based on the amount of radiation not negated by Radiation Filters
-or treated by Medical Centres.
+There is a percentage chance to lose a colonist to radiation sickness
+each day, which increases based on the amount of radiation not negated
+by Radiation Filters or treated by Medical Centres.
 
 Radiation | Chance of losing one colonist
 ----------|------------------------------

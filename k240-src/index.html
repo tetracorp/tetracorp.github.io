@@ -3,9 +3,28 @@ layout: default
 title: Main Index
 ---
 
+  <p><em>Exploring K240</em> disassembles and explores the undocumented
+  game mechanics of the 1994 Commodore Amiga game K240.</p>
+
   <h3>Game Mechanics</h3>
   <ul class="posts">
-    {% for post in site.categories.game-mechanics %}
+    {% for post in site.categories.game-mechanics | sort %}
       <li><a href="{{site.baseurl}}{{ post.url }}">{{ post.title }}</a></li>
     {% endfor %}
+  </ul>
+
+  <h3>Fun</h3>
+  <ul class="posts">
+    {% for post in site.categories.fun | sort %}
+      <li><a href="{{site.baseurl}}{{ post.url }}">{{ post.title }}</a></li>
+    {% endfor %}
+  </ul>
+
+  <h3>Todo</h3>
+  <ul class="posts">
+    <li>Missile effects</li>
+    <li>Ship combat and hardpoint effects</li>
+    <li>Alien building stats</li>
+    <li>Alien behaviour / AI routines</li>
+    <li>Individual alien pages</li>
   </ul>
