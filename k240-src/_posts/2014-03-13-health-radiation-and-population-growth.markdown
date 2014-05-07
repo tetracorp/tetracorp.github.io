@@ -18,7 +18,8 @@ A colony with zero colonists left is automatically destroyed.
 Medical centres have exactly two uses: to stop virus outbreaks,
 and treat radiation sickness.
 
-If the colony has one Medical Centre for every 100 colonists after the
+An outbreak can begin due to [random event](random-events.html).
+Once the colony has one Medical Centre for every 100 colonists after the
 first 50, the outbreak ends. Otherwise, it loses two colonists per day.
 Medical Centres can end virus outbreaks even if the building is without
 power.
@@ -59,5 +60,6 @@ population drops to 30 or lower. If a reason is given (i.e. lack of food,
 air or water), this means the colony is out of surplus in that resource and
 may be losing colonists quickly.
 
-If no reason is given, the most likely causes are radiation or certain
-alien population-reducing weapons.
+If no reason is given, the most likely causes are recent housing
+destruction, high radiation, or certain alien population-reducing
+weapons.

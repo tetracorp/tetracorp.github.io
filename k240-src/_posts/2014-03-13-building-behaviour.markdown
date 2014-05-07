@@ -124,7 +124,7 @@ at 40% efficiency. Each day, there is only a 40% chance that a day's
 progress will be made.
 
 There appears to he a maximum of 64 shipyards at any one time. Orbital Space
-Docks and Command Centres (producing Orbital Space Docks) are likely to count
+Docks and Command Centres (producing Orbital Space Docks) may count
 toward this limit.
 
 ### Landing Pad
@@ -137,14 +137,15 @@ level itself) by 10%. In the event of a virus outbreak, a colony also
 requires one Medical Centre for every 100 full colonists after the first 50
 in order to end the outbreak.
 
-See Health, Radiation and Population Growth.
+See [Health, Radiation and Population Growth](health-radiation-and-population-growth.html).
 
 ### Security Centre
 A colony needs one Security Centre for every full 100 colonists after the
-first 50 to prevent social unrest. See Security and Morale.
+first 50 to prevent social unrest.
+See [Security and Morale](security-and-morale.html).
 
 ### "Protected" buildings
 In addition to the laser turret attached to the
 Protected Resiblock, Protected Solar Matrix, and Protected Environment Control,
 these buildings have higher hit points than their non-protected counterparts
-(see Building Hit Points). Protected Storage Tower does not.
+(see [Building Hitpoints](building-hitpoints.html)). Protected Storage Tower does not.

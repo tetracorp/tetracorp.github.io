@@ -57,7 +57,7 @@ unexpected manner.
 | 39  | Powerplant              | 0     | N/A      |
 | 40  | C.P.U.                  | 0     | No       |
 
-### Unexpected Failure Modes
+### Unexpected failure modes
 When Gravity Nullifier switches off due to a power outage, it does not
 automatically switch itself back on when power is restored.
 
@@ -85,5 +85,6 @@ are killed at the following rate each day:
 | Food     | Kills 1/10 of affected colonists, plus one  |
 | Water    | Kills 1/5 of affected colonists, plus one   |
 
-Additionally, for each resource in the red, social unrest increases by +2
+Additionally, for each resource in the red,
+[social unrest](security-and-morale.html) increases by +2
 points per day.
