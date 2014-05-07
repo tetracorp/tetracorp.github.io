@@ -26,7 +26,8 @@ Start value is recalculated at the beginning of the game, but appears in
 the game data and is included here for completeness.
 
 An ore can have its price fixed by the Imperial Treasury for 2-5 years
-due to a random event. It remains at whatever its current value is
+due to a [random event](random-events.html).
+It remains at whatever its current value is
 and ignores the next 2-5 recalculation events.
 
 ### Alternate income streams
