@@ -60,3 +60,6 @@ Open(), Read() and Write(). By identifying what parts of memory are
 written and read by the save game function, we can tell the entirety
 of what holds the current game state. We can also tell how the alien
 data files are stored based on how they're read into memory.
+
+Another useful tool is WinUAE, which has a built-in debugger and can
+generate save states during a game.
