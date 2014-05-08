@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+
+    <link rel="stylesheet" type="text/css" href="https://tetracorp.github.io/k240/stylesheets/stylesheet.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="https://tetracorp.github.io/k240/stylesheets/pygment_trac.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="https://tetracorp.github.io/k240/stylesheets/print.css" media="print">
+
+    <title>Exploring K240: About This Project</title>
+  </head>
+
+  <body>
+
+    <header>
+      <div class="container">
+        <h1>About This Project</h1>
+        <h2>; <a href="https://tetracorp.github.io/k240/">Exploring K240</a>, a disassembly project</h2>
+
+<!--
+        <section id="downloads">
+          <a href="https://github.com/tetracorp" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+        </section>
+-->
+      </div>
+    </header>
+
+    <div class="container">
+      <section id="main_content">
+
+<p>Exploring K240 is a project to disassemble and decipher the undocumented
+game mechanics of K240, the space exploration game released on
+Commodore Amiga in 1994.</p>
+
+<h3>Why explore K240?</h3>
+
+<p>K240 was one of my favourite Amiga games of all time. Despite a heavy
+game manual, many of the game&#39;s underlying rules or mechanics were a
+complete mystery to the player. How much damage does each weapon do?
+How many hit points does each building have?</p>
+
+<p>Twenty years later, this project sets out to find those answers.</p>
+
+<h3>What can we learn?</h3>
+
+<p>The biggest questions this projects seeks to answer:</p>
+
+<ol>
+<li>How does ship combat work? (How do ships choose their targets, how
+much damage does each weapon deal, and what effect have hardpoints like
+Deflector and Warp Generator?)</li>
+<li>How does ground combat work? (How much damage does each weapon do,
+how does fire spread, how many hit points does each building have,
+and how does Vortex operate?)</li>
+<li>How do missiles work? (What is their damage and effect?)</li>
+<li>How do colonies operate? (What affects population growth, what effect does
+radiation have, what effect does population have,?)</li>
+<li>How do buildings work? (What hitpoints do each building have, what
+effect does each building have?)</li>
+<li>How do aliens differ? (What are their tactics and  AI routines, do
+aliens play by the same rules as Terrans regarding cost and mining,
+what are the stats of their ships, missiles and buildings, and how does
+each alien differ? Does fire really affect Swixarans more, and why do
+abandoned Ore Eater colonies explode?)</li>
+<li>What are the differences between K240 v1.886 and the bug-fixed version
+K240 v2.000?</li>
+</ol>
+
+<h3>How to explore K240?</h3>
+
+<p>I began by running the main game executable through an Amiga disassembly
+program called IRA, which turns an Amiga executable file into 68000
+assembly language.</p>
+
+<p>The result is difficult to understand since it&#39;s over 40,000 lines of
+low-level code and has no comments or even variable names. Some useful
+approaches have helped to make sense of the code:</p>
+
+<ol>
+<li>Searching for known numbers or strings, such as game text or the
+known price of a ship. This makes it easy to zero in on code relating
+to certain functions.</li>
+<li>Find-replacing variable names throughout the code and adding comments
+once a fuction has been understood. This sometimes makes other parts clearer.</li>
+<li>Identifying the random number generator function. This is typically
+used to &quot;roll dice&quot; or simulate chance, and makes it very easy to zero
+in on game rules.</li>
+<li>Identifying system calls to the AmigaOS functions, particularly
+Open(), Read() and Write(). By identifying what parts of memory are
+written and read by the save game function, we can tell the entirety
+of what holds the current game state. We can also tell how the alien
+data files are stored based on how they&#39;re read into memory.</li>
+</ol>
+
+
+
+      </section>
+    </div>
+
+    
+  </body>
+</html>

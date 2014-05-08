@@ -5,7 +5,7 @@ categories: game-mechanics
 ---
 
 While most buildings operate exactly as described in the game's manual,
-some behave in undocumented or unexplained ways.
+some behave in undocumented or unexpected ways.
 
 ### Storage Facility / Storage Tower
 If an ore storage building is destroyed, no ore is lost unless the total
