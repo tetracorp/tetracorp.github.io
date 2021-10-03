@@ -1,38 +1,46 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <meta charset='utf-8'>
+---
+layout: default
+title: Video game disassembly and analysis projects
+---
 
-    <link rel="stylesheet" type="text/css" href="stylesheets/stylesheet.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/pygment_trac.css" media="screen" />
-    <link rel="stylesheet" type="text/css" href="stylesheets/print.css" media="print" />
+  <p>This site analyzes and documents classic video games. Read the
+  <a href="https://tetracorp.github.io/about/summary.html">summary</a>
+  of the project's most critical discoveries.</p>
 
-    <title>Tetracorp</title>
-  </head>
+  {% assign sortedPosts = site.posts | sort: 'slug' %}
 
-  <body>
+  <h3>Major projects</h3>
+  <ul class="posts">
+    <li><a href="https://tetracorp.github.io/k240/">Exploring K240</a>, the 1994 Amiga RTS</li>
+    <li><a href="https://tetracorp.github.io/dungeons-of-avalon/">Exploring the Dungeons of Avalon</a>, the 1992 Amiga RPG series</li>
+    <li><a href="https://tetracorp.github.io/tokimeki-memorial/">Exploring Tokimeki Memorial</a>, the 1994 PlayStation visual novel</li>
+  </ul>
 
-    <header>
-      <div class="container">
-        <h1>Tetracorp</h1>
-        <h2></h2>
+  <h3>Amiga games</h3>
+  <ul class="posts">
+    {% for post in sortedPosts %}
+      {% if post.categories contains "amiga" %}
+        <li><a href="{{site.baseurl}}{{ post.url }}">{{ post.title }}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
 
-<!--        <section id="downloads">
-          <a href="https://github.com/tetracorp" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
-      </div>-->
-    </header>
+  <h3>Disassembly and analysis guides</h3>
+  <ul class="posts">
+    {% for post in sortedPosts %}
+      {% if post.categories contains "guide" %}
+        <li><a href="{{site.baseurl}}{{ post.url }}">{{ post.title }}</a></li>
+      {% endif %}
+    {% endfor %}
+  </ul>
 
-    <div class="container">
-      <section id="main_content">
-        <ul class="posts">
-          <li><a href="https://tetracorp.github.io/k240/">Exploring K240</a> (Amiga)
-          <li><a href="https://tetracorp.github.io/dungeons-of-avalon/">Exploring the Dungeons of Avalon</a> (Amiga)
-          <li><a href="https://tetracorp.github.io/tokimeki-memorial/">Exploring Tokimeki Memorial</a> (PSX)
-        </ul>
-      </section>
-    </div>
-
-    
-  </body>
-</html>
+  <h3>Links to other resources</h3>
+  <ul class="posts">
+    <li><a href="https://amigasourcepres.gitlab.io/">Amiga Source Preservation</a> - Amiga textbooks and source code</li>
+    <li><a href="https://github.com/grovdata/Amiga_Sources">Amiga Sources</a> - Links to Amiga hardware and software sources</li>
+    <li><a href="https://github.com/historicalsource">Historical Source</a> - Source code for games of various platforms</li>
+    <li><a href="https://github.com/videogamepreservation/">Video Game Preservation</a> - Source code for games of various platforms</li>
+    <li><a href="https://github.com/RetailGameSourceCode">Retail Video Game Code</a> - Various platforms</li>
+    <li><a href="https://en.wikipedia.org/wiki/List_of_commercial_video_games_with_later_released_source_code">List of commercial video games with later released source code</a> - Wikipedia</li>
+    <li><a href="https://en.wikipedia.org/wiki/List_of_commercial_video_games_with_available_source_code">List of commercial video games with available source code</a> - Wikipedia</li>
+  </ul>

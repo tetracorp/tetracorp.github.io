@@ -1,0 +1,21 @@
+name: Tetracorp
+baseurl: https://tetracorp.github.io
+permalink: none
+
+markdown: kramdown
+kramdown:
+  no_auto_typographic: true
+  input: GFM
+  hard_wrap: false
+
+plugins:
+  - jemoji
+
+defaults:
+  -
+    scope:
+      path: ""
+      type: "posts"
+    values:
+      layout: "post"
+

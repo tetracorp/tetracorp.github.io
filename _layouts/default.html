@@ -7,6 +7,7 @@
     <link rel="stylesheet" type="text/css" href="{{site.baseurl}}/stylesheets/stylesheet.css" media="screen">
     <link rel="stylesheet" type="text/css" href="{{site.baseurl}}/stylesheets/pygment_trac.css" media="screen">
     <link rel="stylesheet" type="text/css" href="{{site.baseurl}}/stylesheets/print.css" media="print">
+    <link rel="shortcut icon" href="{{site.baseurl}}/images/scoutship_28px.png">
 
     <title>{{site.name}}: {{page.title}}</title>
   </head>
@@ -16,13 +17,8 @@
     <header>
       <div class="container">
         <h1>{{page.title}}</h1>
-        <h2>; <a href="https://tetracorp.github.io/k240/">{{site.name}}</a>, a disassembly project</h2>
+        <h2>; <a href="https://tetracorp.github.io/">{{site.name}}</a> video game disassembly and analysis</h2>
 
-<!--
-        <section id="downloads">
-          <a href="https://github.com/tetracorp" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
-        </section>
--->
       </div>
     </header>
 
@@ -34,6 +30,12 @@
       </section>
     </div>
 
+    <footer>
+      <p class="copyright">
+        <a href="https://github.com/tetracorp/tetracorp.github.io/issues/new">Submit feedback</a> &bull;
+        <a href="https://tetracorp.github.io/tetracorp.github.io/about/copyright.html">{% if page.copyright %}{{page.copyright}}{% elsif page.license %}{{page.license}}{% else %}CC BY{% endif %}</a>
+      </p>
+    </footer>
     
   </body>
 </html>

@@ -12,7 +12,7 @@ body {
 
 .container {
   width: 90%;
-  max-width: 600px;
+  max-width: 900px;
   margin: 0 auto;
 }
 
@@ -244,4 +244,84 @@ a {
 
 .cf {
   zoom:1;
+}
+
+/*****************/
+/* Images        */
+/*****************/
+
+.right {
+  float: right;
+  font-size: 80%;
+  color: #aaaaaa;
+  margin: 0 0 0 1em;
+}
+
+.center {
+  font-size: 80%;
+  color: #aaaaaa;
+  text-align: center;
+  overflow: hidden;
+
+  clear: both;
+}
+
+.left {
+  font-size: 80%;
+  color: #aaaaaa;
+}
+
+img.double, .double img {
+  transform:scale(2.0);
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+footer {
+  width: 90%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+footer p {
+  text-align: right;
+  font-size: 80%;
+  color: #aaaaaa;
+  padding-right: 1em;
+}
+
+footer p a {
+  color: #aaaaaa;
+  text-decoration: none;
+  text-shadow: none;
+}
+
+footer p a:hover{
+  text-decoration: underline;
+}
+
+p code, li code {
+  font-size: 120%;
+  background: #333333;
+  padding: 0 2px;
+}
+
+ol#markdown-toc {
+  border: 1px solid #aaa;
+  display: inline-block;
+  padding: 0.5em 1em 0.5em 3em;
+  margin-left: 2em;
+  background: black;
+  color: #aaaaaa;
+}
+
+table td em {
+  color: red;
+  font-style: normal;
+}
+
+table td strong {
+  color: lime;
+  font-weight: normal;
 }
