@@ -143,16 +143,18 @@ MatchPatch was subsequently redistributed in two popular sources.
 
 The first is CU Amiga Magazine coverdisk #22 for the December 1991 issue, where
 Martin Rayner compiled 21 public domain or freeware Amiga games onto a single
-disk. This was done by compressing many of the games with xfdMaster. This
-version of MatchPatch is compressed from 206,712 bytes to to 71,364 bytes (still
+disk. This was done by compressing many of the games (which, according to
+xfdList, are compressed with a variety of tools). This version of MatchPatch is
+compressed with Imploder Library from 206,712 bytes to to 71,364 bytes (still
 7.9% of the entire disk capacity) and can be unpacked with xfdDecrunch. This
 disk was later distributed as a public domain disk under the title "21 Games".
 
 MatchPatch then appeared on Assassins Games #20, disk dated 2 September 1992.
-This version was probably taken from the CU Amiga coverdisk as it's compressed
-with xfdMaster. Some doubt is cast on this order of events because the ASI20
-version has an earlier file date of April 1991, but Amiga file dates are often
-inaccurate as the most popular models did not have a real-time clock.
+This version was probably taken from the CU Amiga coverdisk as it's the same
+version compressed with Imploder Library. Some doubt is cast on this order of
+events because the ASI20 version has an earlier file date of April 1991, but
+Amiga file dates are often inaccurate as the most popular models did not have a
+real-time clock.
 
 On both CU22 and ASI20, the game is distributed without documentation, meaning
 that many did not know who the author was. The game was widely assumed to be
