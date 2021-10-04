@@ -1,17 +1,18 @@
 ---
-title: "Match Patch (1990)"
+title: "MatchPatch (1990)"
 categories: amiga
 ---
 
-__Match Patch__ is a Commodore Amiga game released in 1990. It is a public
-domain platformer about shooting enemies with bullets of the matching type.
+__MatchPatch__ (sometimes written _Match Patch_) is a Commodore Amiga game
+released in 1990. It is a public domain platformer about shooting enemies with
+bullets of the matching type.
 
 1. Table of Contents
 {:toc}
 
 ### Cheats
 
-There are two built-in cheat codes in Match Patch.
+There are two built-in cheat codes in MatchPatch.
 
 - At the title screen, hold left and press fire to skip to level 10.
 - At the title screen, hold right and press fire to reduce the number of points
@@ -22,7 +23,8 @@ likely that these are the only two cheats in the game.
 
 If the game is still too difficult, you can hack the game to start with 99 lives:
 
-- Decompress MatchPatch with xfdDecrunch (xfdMaster from Aminet)
+- If your MatchPatch is the 71,364 byte packed version, decompress MatchPatch
+  with xfdDecrunch (xfdMaster from Aminet)
 - Use a hex editor to change the bytes at 0x327 and 0x2129 from "03" to "63".
 
 ### Documentation
@@ -64,7 +66,7 @@ You receive a bonus life for every 20,000 points.
 There are 24 different levels. When you reach level 25, it just loops around to
 level 1 again. The game seems to continue indefinitely until you run out of
 lives, at which point you enter the high score chart. The high scores aren't
-saved between plays&mdash;Match Patch doesn't load `dos.library`, which contains
+saved between plays&mdash;MatchPatch doesn't load `dos.library`, which contains
 the standard file load/safe functions. (It only loads `graphics.library`, and
 only to copy bytes 38-41 (decimal) from the library, which is read once at new
 game start, I'm not sure what for.)
@@ -73,11 +75,51 @@ The game doesn't seem to run well on A1200. This is a problem you saw less after
 the A1200 was released in October 1992 and it became common to make sure games
 were forwardly-compatible with the new system.
 
+### Source code
+
+See the [matchpatch-amiga](https://github.com/tetracorp/matchpatch-amiga)
+repository for a copy of the game's original source code and program file.
+
 ### History of development and release
 
-According to a date on the title screen, Match Patch was created in 1990 by
-someone known only as "SD", who provided both ideas and code. The high score
-chart also credits the game's program, code, graphics, and sound to this SD.
+MatchPatch's development history has been a mystery since it was most commonly
+distributed in a compressed form on compilation disks without documentation, and
+the game itself only identifies the developer as "SD" and with a publication
+date of 1990. Luckily, a little research has uncovered more information.
+
+MatchPatch was created by Stephen Winstanley, nicknamed "SD". It was written in
+Devpac 2 assembler and completed on 12-10-90 (12 October 1990, it must be
+concluded). It was released on a coverdisk with 
+[Amiga Computing issue 33](https://archive.org/details/AmigaComputingIssue033Feb91/Amiga_Computing_Issue_033_Feb_91) (Feb 1991)
+, and was added to the disk by Jeff Walker on December 1990. This release,
+notably, included the full source code, and a readme giving the author's full
+name.
+
+    MatchPatch.S.pp            37852 ----rwed 04-Dec-90 09:44:56
+    MatchPatch.info             1614 ----rwed 04-Dec-90 14:53:54
+    MatchPatch.S.info            775 ----rwed 04-Dec-90 14:53:55
+    MatchPatch.DOC.info          835 ----rwed 04-Dec-90 14:53:58
+    MatchPatch                206712 ----rwed 10-Dec-90 10:09:24
+    .info                         55 ----rwed 10-Dec-90 10:22:40
+    MatchPatch.DOC               555 ----rwed 10-Dec-90 11:45:25
+
+The documentation file MatchPatch.DOC names Stephen Winstanley and labels the
+game as copyright 1991 Amiga Computing magazine; i.e. not truly public domain
+(although the Amiga "public domain" scene often used the term to refer to games
+which were more correctly freeware or shareware). However, _Amiga Computing_ #33,
+page 32, gives us an article (excerpted below) about the game which declares it
+as freely distributable online (although of historical note, it refers to dialup
+modem bulletin board systems, as the World Wide Web did not exist in 1991).
+
+The source code is given here as a powerpacked file, since it's 203,112 bytes
+unpacked. You can unpack it by running PowerPatcher and copying the file.
+
+Winstanley appears to have created MatchPatch single-handedly. The title screen
+credits "SD" with both ideas and code. The high score chart also credits the
+game's program, code, graphics, and sound to SD, although you never see the
+entry "SD" because they're the last entry, meaning that you always replace the
+name SD if you enter the high scores, and you never see the high scores
+before you enter it.
 
     ; 250000 -*------*-
     ; 225000  MATCH    
@@ -91,41 +133,41 @@ chart also credits the game's program, code, graphics, and sound to this SD.
     ;  25000     SD.   
     ;      0 ..........
 
-The name "SD" is never actually shown to the player on the high score chart,
-since it's the last entry shown, you need to beat it to make an entry, and the
-game only shows you the high score chart when you make an entry.
+Stephen Winstanley is also credited as the coder of
+[Yelp!](https://hol.abime.net/5579) (1988), which was distributed with _ST Amiga
+Format_ #9 (Mar 1989). The high scores for that game are credited to "Stephen.",
+"Daryl.", and "SD", and the documentation file credits "S Winstanley". It might
+be that his full name is Stephen Daryl Winstanley.
 
-Match Patch was distributed widely in two popular sources: the CU Amiga Magazine
-coverdisk #22 for the December 1991 issue, compiled by Martin Rayner; and the
-Assassins Games compilation disk #20, where it has the file date of 2 April
-1991, and the disk itself is dated 2 September 1992. CU #22 was also
-redistributed by Public Domain disk companies under the title "21 Games". Match
-Patch does not appear to have been uploaded to Aminet.
+MatchPatch was subsequently redistributed in two popular sources.
 
-It is compressed with xfdMaster and has a filesize of 71,364 bytes, not doubt to
-fit better on the disk (although this is still a significant 7.9% of an Amiga
-disk, so Match Patch takes up more than the average of 21 Games). Uncompressed,
-Match Patch is 206,712 bytes. You can decompress it with xfdDecrunch (xfdMaster
-should be available on Aminet). It's unknown whether Martin Rayner compressed
-it, or it was already compressed. A lot of games on CU22 are packed with XFD,
-but then it's a coincidence that ASI20's later release has Match Patch dated
-earlier than CU22 (although Amiga file dates were often inaccurate due to the
-lack of a real-time clock in the basic models).
+The first is CU Amiga Magazine coverdisk #22 for the December 1991 issue, where
+Martin Rayner compiled 21 public domain or freeware Amiga games onto a single
+disk. This was done by compressing many of the games with xfdMaster. This
+version of MatchPatch is compressed from 206,712 bytes to to 71,364 bytes (still
+7.9% of the entire disk capacity) and can be unpacked with xfdDecrunch. This
+disk was later distributed as a public domain disk under the title "21 Games".
 
-On both CU22 and ASI20, the game is distributed without documentation. This
-makes it difficult to know who the author is, or even to verify that the game is
-public domain. Content has been falsely distributed as Public Domain before,
-including [Dungeons of Avalon](https://tetracorp.github.io/dungeons-of-avalon/)
+MatchPatch then appeared on Assassins Games #20, disk dated 2 September 1992.
+This version was probably taken from the CU Amiga coverdisk as it's compressed
+with xfdMaster. Some doubt is cast on this order of events because the ASI20
+version has an earlier file date of April 1991, but Amiga file dates are often
+inaccurate as the most popular models did not have a real-time clock.
+
+On both CU22 and ASI20, the game is distributed without documentation, meaning
+that many did not know who the author was. The game was widely assumed to be
+public domain, although its license in _Amiga Computing_ makes it more
+technically freeware as it remains under copyright. Content has been incorrectly
+distributed as Public Domain before, including
+[Dungeons of Avalon](https://tetracorp.github.io/dungeons-of-avalon/),
 and even CU22 itself.
 
-It's a reasonable assumption that the game was written in assembly language,
-rather than something like AMOS Basic (which produces awful code when
-disassembled). The whole game is one standalone file, except that it calls on
+The whole game is one standalone file, except that it calls on
 the Amiga's `graphics.library`, and the uncrunched version requires
 `explode.library` due to being packed with XFD.
 
-You can see some IFF file headers for IFF 8SVX audio files in the code, with the
-following comment:
+You can see some IFF file headers for IFF 8SVX audio files in the executable,
+with the following comment:
 
     Recorded with PERFECT SOUND from SunRize Industries.  (409) 846-1311
 
@@ -134,3 +176,1494 @@ It appears to reference the
 sampler cartridge, which was released
 in [three revisions](http://amiga.resource.cx/exp/perfectsound) in 1986, 1987,
 and 1988. The author likely created all the game's sounds by themself.
+
+### Manual
+
+The following article appeared in _Amiga Computing_ #33 p.32. It's the closest
+thing to official documentation.
+
+> MatchPatch
+> 
+> MatchPatch is a 24 level platform game in which you have to destroy all the
+> aliens on each level, or get to a bonus screen to progress to the next level,
+> To prevent you from achieving this goal there are deadly aliens that kill on
+> contact, plus a timer which will take one of your lives if it expires. There
+> are five different aliens to overcome, all with individual characteristics.
+> 
+> The stone men walk slowly around the platforms, moving from the top to the
+> bottom of the screen. Icebergs on the other hand. can jump up to higher
+> platforms suddenly, as can the fire balls, which move around very quickly.
+> 
+> Watch out for storm clouds &ndash electricity &ndash; which can change
+> direction just when you think you're safe, and the light bulbs which bounce
+> off the platforms at an angle.
+> 
+> Which aliens will be on which screen and their order is shown at the top left
+> of the display. This order is important because it controls the types of
+> bullet you can fire. An arrow under the order of the aliens at the top left of
+> the display indicates which type of alien your bullets will kill.
+> 
+> If the arrow is under the iceberg alien for example, this is the only type you
+> can kill. Any other aliens you hit will be transformed into the next alien in
+> that level's order, but not to the type you can kill.
+> 
+> To enable you to kill all the aliens there are holes in the bottom platforms.
+> Over the holes ore arrows that indicate which type of bullet you can collect
+> if you lump down the hole.
+> 
+> Jump down the hole with the Fire button pressed and not only do you collect
+> the indicated type of bullet but you also cycle the arrow over the hole to the
+> next bullet in the level's order. After jumping down the hole you'll appear at
+> the top of the screen, so look before you leap! As you'd expect, the aliens
+> can jump down the holes as well. After doing so, they'll be transformed into
+> the type of alien indicated by the arrow, To help or hinder, there are various
+> bonuses to collect.
+> 
+> Cakes get you an extra life and the glass boosts your fire range. Moving over
+> the clock stops the clock and if you get the egg timer, you'll win extra time.
+> 
+> The coin is a score bonus, the bomb kills all the aliens on the screen, and
+> the tap drowns all the fire balls. An on/off switch gives you mega bullets
+> that keep going after killing an alien. But watch out for the herbs, they're
+> deadly!  If you collect the flower bonus you will go to a maze level where you
+> must reach the exit at the bottom of the screen before the timer expires,
+> succeed and you get extra points. You then go to the next level of the main
+> game.
+> 
+> There are 16 maze levels and movement between them is controlled by a joystick
+> in port 2, left and right to run left and right, up to jump up, fire to shoot
+> bullets. At any time during the game the left mouse button will pause the game
+> and the right mouse button will restart. To start the game after loading,
+> press fire.
+> 
+> At the end of the game, if your score is high enough, you will be able to
+> enter your name in the high score table. The whole program loads into memory
+> so the disk can be removed after loading. Don't worry about the disk drive
+> light staying on, it's just a bit of sloppy programming.
+> 
+> Hints
+> 
+> After dying, you'll be invulnerable until the timer restarts. On the title
+> screen hold the joystick right then press the fire button for a extra life
+> every 10,000 points, instead of the usual 20,000 points. Again on the title
+> screen. hold the joystick left then press the fire button to start on Level
+> 10.
+> 
+> If the timer is getting low on a level and there are a lot of aliens left, use
+> the bonuses if possible.
+> 
+> The flower bonus ends the current level without loss of life even if you do
+> not complete the maze.
+> 
+> Try to set all the arrows the same. This limits the types of alien on a level,
+> making it easier to kill them.
+> 
+> Find a safe platform area where you can shoot the aliens as they run by. The
+> on/off switch bonus lets your bullet pass through on alien after it has been
+> hit, allowing you to shoot more than one at a time.
+> 
+> On the maze levels, time is limited, so start to run immediately and work out
+> your route on the move, Failing to do this will probably mean no extra points.
+> 
+> MatchPatch was written in assembly language (Devpac 2) by Stephen Winstanley.
+> It may be offered for download on bulletin boards provided it is made
+> available as a free download.
+
+### Maps
+
+Here are the maps extracted from the game. They are the maps for the 24 levels
+(after which the game loops), 16 mazes, and the maps shown as win messages. Note
+that the top and bottom rows of the level maps don't actually appear on screen.
+
+#### Level map 1
+
+    11111111__11111111____11111111__11111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____111111111__________111111111____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111____11________1111________11____1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__111111_______111111_______111111__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111_________1111________1111_________111
+    1111________________________________1111
+    11111______________________________11111
+    111111____________________________111111
+    1111111__________________________1111111
+    11111111__11111111____11111111__11111111
+    11111111__11111111____11111111__11111111
+    11111111__11111111____11111111__11111111
+    11111111__11111111____11111111__11111111
+    11111111__11111111____11111111__11111111
+
+#### Level map 2
+
+    1111111________1111111111________1111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_____111111______________111111_____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__1____1____1__________1____1____1__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111_________111111____111111_________111
+    11__________1____1____1____1__________11
+    11__________1____1____1____1__________11
+    11__________1____1____1____1__________11
+    11__________1____1____1____1__________11
+    11_____111111____11__11____111111_____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111111________1111111111________1111111
+    1111111________1111111111________1111111
+    1111111________1111111111________1111111
+    1111111________1111111111________1111111
+    1111111________1111111111________1111111
+
+#### Level map 3
+
+    11__111111111111111__111111111111111__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111111____________________________111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____1111________1111________1111____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11________1111____________1111________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________111111111111____________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__111111111111111__111111111111111__11
+    11__111111111111111__111111111111111__11
+    11__111111111111111__111111111111111__11
+    11__111111111111111__111111111111111__11
+    11__111111111111111__111111111111111__11
+
+#### Level map 4
+
+    111____111111____111111____111111____111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_______11________11________11_______11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11___11_______11________11_______11___11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_______11________11________11_______11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111__________11________11__________1111
+    11____________________________________11
+    11____________________________________11
+    11_______11________11________11_______11
+    11______1111______1111______1111______11
+    111____111111____111111____111111____111
+    111____111111____111111____111111____111
+    111____111111____111111____111111____111
+    111____111111____111111____111111____111
+    111____111111____111111____111111____111
+
+#### Level map 5
+
+    1111111__________________________1111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11___11____11____11__11____11____11___11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111____11____11________11____11____1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__1__1__1__1__1__11__1__1__1__1__1__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____1111____11__1111__11____1111____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111111__________________________1111111
+    1111111__________________________1111111
+    1111111__________________________1111111
+    1111111__________________________1111111
+    1111111__________________________1111111
+
+#### Level map 6
+
+    1111________________________________1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11________11________________11________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11______11____________________11______11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____11________________________11____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__11____________________________11__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111________________________________1111
+    1111________________________________1111
+    1111________________________________1111
+    1111________________________________1111
+    1111________________________________1111
+
+#### Level map 7
+
+    1111111111111____1____1____1111111111111
+    1111________________________________1111
+    1111________________________________1111
+    1111________________________________1111
+    1111________________________________1111
+    1111________________________________1111
+    1111________________________________1111
+    11____________________________________11
+    11____________________________________11
+    11111111____1111111__1111111____11111111
+    11____________________________________11
+    11____________________________________11
+    111__________________________________111
+    111__________________________________111
+    11111_____11111111____11111111_____11111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111____11111111___11___11111111____1111
+    1111_______________11_______________1111
+    111__________________________________111
+    11____________________________________11
+    11____________________________________11
+    11___11____1_____1____1_____1____11___11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111__________________________________111
+    1111111111111____1____1____1111111111111
+    1111111111111____1____1____1111111111111
+    1111111111111____1____1____1111111111111
+    1111111111111____1____1____1111111111111
+    1111111111111____1____1____1111111111111
+
+#### Level map 8
+
+    1111111111______11111111______1111111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__111__1111111111111111111111__111__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__111111__1111111111111111__111111__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__111111111111__1111__111111111111__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__11111111__111111111111__11111111__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111111111______11111111______1111111111
+    1111111111______11111111______1111111111
+    1111111111______11111111______1111111111
+    1111111111______11111111______1111111111
+    1111111111______11111111______1111111111
+
+#### Level map 9
+
+    111111______1111________1111______111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111__11__1__11__1__11__1__11__1__11__111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111__1__1__1__1__1__1__1__1__1__1__1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111__1__1__1__1__1_11_1__1__1__1__1__111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__11__11__11__11____11__11__11__11__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111111______1111________1111______111111
+    111111______1111________1111______111111
+    111111______1111________1111______111111
+    111111______1111________1111______111111
+    111111______1111________1111______111111
+
+#### Level map 10
+
+    111111____________1111____________111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__________1111111111111111__________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____111111________________111111____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_________111111______111111_________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111111___________111111___________111_11
+    111________________11_____________1_1111
+    111_______________________________1__111
+    111111____________________________1__111
+    11___1____________________________1__111
+    11___1_____________11_____________1_1111
+    111111____________1111____________111_11
+    111111____________1111____________111111
+    111111____________1111____________111111
+    111111____________1111____________111111
+    111111____________1111____________111111
+
+#### Level map 11
+
+    11__1111__1111__111__111__1111__1111__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11______11111111________11111111______11
+    11______1______________________1______11
+    11___1111______________________1111___11
+    11____________________________________11
+    11____________________________________11
+    11_____________1111__1111_____________11
+    11____________________________________11
+    11___11__________________________11___11
+    11____________________________________11
+    11____________________________________11
+    11__1__1111______111111______1111__1__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11111__1111__________________1111__11111
+    11__1_____1__________________1_____1__11
+    11__1_____1________11________1_____1__11
+    11__1_____1_______1111_______1_____1__11
+    11__1_____1______111111______1_____1__11
+    11111111__1111__11111111__1111__11111111
+    11__1111__1111__111__111__1111__1111__11
+    11__1111__1111__111__111__1111__1111__11
+    11__1111__1111__111__111__1111__1111__11
+    11__1111__1111__111__111__1111__1111__11
+
+#### Level map 12
+
+    1111111____11111________11111____1111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_____11111______1111______11111_____11
+    11___111________________________111___11
+    11__11____________________________11__11
+    11____________________________________11
+    11____________________________________11
+    11__________1111111__1111111__________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111111111111________________111111111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_________1___1________1___1_________11
+    11____111__11111___11___11111__111____11
+    11___________1____________1___________11
+    11___________1____________1___________11
+    11___________1____________1___________11
+    11___________1____________1___________11
+    1111111____11111________11111____1111111
+    1111111____11111________11111____1111111
+    1111111____11111________11111____1111111
+    1111111____11111________11111____1111111
+    1111111____11111________11111____1111111
+
+#### Level map 13
+
+    11111111____1111111111111111____11111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11______11111111________11111111______11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__111111____1111____1111____111111__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111111___11____11111111____11___1111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____1111__111111____111111__1111____11
+    11__________1______________1__________11
+    11__________1______________1__________11
+    11__________1______________1__________11
+    11__________1______________1__________11
+    11111111____1111111111111111____11111111
+    11111111____1111111111111111____11111111
+    11111111____1111111111111111____11111111
+    11111111____1111111111111111____11111111
+    11111111____1111111111111111____11111111
+
+#### Level map 14
+
+    111111____1111____1111____1111____111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_______11__________________11_______11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111111111111111111____111111111111111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111_______11______11______11_______1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11___111111__111111__111111__111111___11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111111____1111____1111____1111____111111
+    111111____1111____1111____1111____111111
+    111111____1111____1111____1111____111111
+    111111____1111____1111____1111____111111
+    111111____1111____1111____1111____111111
+
+#### Level map 15
+
+    111111____________________________111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__________1______________1__________11
+    1111___1__11111__111111__11111__1___1111
+    11_____1____1____1____1____1____1_____11
+    11_____1____1______________1____1_____11
+    11_____1____1______________1____1_____11
+    11_____1____1____1____1____1____1_____11
+    11___11111__1__1111111111__1__11111___11
+    11_____1____1____1____1____1____1_____11
+    11_____1____1______________1____1_____11
+    11_____1____1______________1____1_____11
+    11_____1____1____1____1____1____1_____11
+    1111___1__11111__111111__11111__1___1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_____111111___11111111___111111_____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111111____________________________111111
+    111111____________________________111111
+    111111____________________________111111
+    111111____________________________111111
+    111111____________________________111111
+
+#### Level map 16
+
+    1111______________1111______________1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11________________1111________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111_________11__________11_________1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11___11__11__________________11__11___11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111_________11__________11_________1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111______________1111______________1111
+    1111______________1111______________1111
+    1111______________1111______________1111
+    1111______________1111______________1111
+    1111______________1111______________1111
+
+#### Level map 17
+
+    1111__111______________________111__1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11__111___________1111___________111__11
+    11____________________________________11
+    11______11____________________11______11
+    11____________________________________11
+    11_________11______________11_________11
+    11____________________________________11
+    11____________11________11____________11
+    11____________________________________11
+    11_________________11_________________11
+    11_________________11_________________11
+    11_________________11_________________11
+    111111_1111_1111___11___1111_1111_111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11______________111__111______________11
+    11____________111______111____________11
+    11__________111__________111__________11
+    11________111______________111________11
+    11______111__________________111______11
+    1111__111______________________111__1111
+    1111__111______________________111__1111
+    1111__111______________________111__1111
+    1111__111______________________111__1111
+    1111__111______________________111__1111
+
+#### Level map 18
+
+    111111____1111____1111____1111____111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________1111____1111____________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____1111____________________1111____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________1111____1111____________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____1111____________________1111____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111111____1111____1111____1111____111111
+    111111____1111____1111____1111____111111
+    111111____1111____1111____1111____111111
+    111111____1111____1111____1111____111111
+    111111____1111____1111____1111____111111
+
+#### Level map 19
+
+    11111111_____1111______1111_____11111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111111__________11__11__________1111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11______1111______1111______1111______11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____11____111111____111111____11____11
+    11____________11________11____________11
+    11____________11________11____________11
+    11____________11________11____________11
+    11____________11________11____________11
+    11__1111______11________11______1111__11
+    11____________11________11____________11
+    11____________11________11____________11
+    11____________11________11____________11
+    11____________11________11____________11
+    11111111_____1111______1111_____11111111
+    11111111_____1111______1111_____11111111
+    11111111_____1111______1111_____11111111
+    11111111_____1111______1111_____11111111
+    11111111_____1111______1111_____11111111
+
+#### Level map 20
+
+    11111111111__1__11111111__1__11111111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_________11111________11111_________11
+    11___________1____________1___________11
+    11___________1____________1___________11
+    11___________1____________1___________11
+    11_______11111____________1____111111111
+    11___1111_______1__11__1__1___________11
+    11________________________1___________11
+    11________________________1___________11
+    11________________________1111111111__11
+    11____________________________________11
+    11111111111_____11____11______________11
+    11____________________________________11
+    11___________________________11111111111
+    11___________1________________________11
+    11___________1____________1___________11
+    11_______11111_1__1__1__1_1___________11
+    11___1111____1____________1111111111__11
+    11___________1____________1___________11
+    11___________1____________1___________11
+    11___________1____________1___________11
+    11111111111__1__11111111__1__11111111111
+    11111111111__1__11111111__1__11111111111
+    11111111111__1__11111111__1__11111111111
+    11111111111__1__11111111__1__11111111111
+    11111111111__1__11111111__1__11111111111
+
+#### Level map 21
+
+    11111111__11111111111111111111__11111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111__________________________________111
+    11111111111111__11111111__11111111111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11111__111111111111__111111111111__11111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111__________________________________111
+    11111111111__11111111111111__11111111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11___1____________________________1___11
+    111111__1111111__111111__1111111__111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_________________11_________________11
+    11111111__11111111111111111111__11111111
+    11111111__11111111111111111111__11111111
+    11111111__11111111111111111111__11111111
+    11111111__11111111111111111111__11111111
+    11111111__11111111111111111111__11111111
+
+#### Level map 22
+
+    11__11111111______1111______11111111__11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11___11111____________________11111___11
+    11____________111111111111____________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    1111_______11______________11_______1111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_____11______111____111______11_____11
+    11____1111____11111__11111____1111____11
+    11_____11______111____111______11_____11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11111______1111____11____1111______11111
+    11________________1111________________11
+    11_________________11_________________11
+    11_____11_________1111_________11_____11
+    11____1111_________11_________1111____11
+    11__11111111______1111______11111111__11
+    11__11111111______1111______11111111__11
+    11__11111111______1111______11111111__11
+    11__11111111______1111______11111111__11
+    11__11111111______1111______11111111__11
+
+#### Level map 23
+
+    111111__111111____________111111__111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____111111____11111111____111111____11
+    11____1____1____1______1____1____1____11
+    11_________1________________1_________11
+    11_________1________________1_________11
+    11_________1________________1_________11
+    1111111____111111______111111____1111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11_________________11_________________11
+    11_____1111_______1__1_______1111_____11
+    11____1__________1____1__________1____11
+    11___1__________1______1__________1___11
+    11__1__________1________1__________1__11
+    11____________1__________1____________11
+    11___________1____________1___________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11________11________________11________11
+    111111__111111____________111111__111111
+    111111__111111____________111111__111111
+    111111__111111____________111111__111111
+    111111__111111____________111111__111111
+    111111__111111____________111111__111111
+
+#### Level map 24
+
+    1111111111__1111111111111111__1111111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111__111111________11________111111__111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11___________1____________1___________11
+    111__111111111____1111____111111111__111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    111__________________________________111
+    1111111_11111___11111111___11111_1111111
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11____________________________________11
+    11___________11111111111111___________11
+    1111________11_____11_____11________1111
+    1111_______________11_______________1111
+    11111______________11______________11111
+    111111____________1111____________111111
+    1111111111__111111____111111__1111111111
+    1111111111__1111111111111111__1111111111
+    1111111111__1111111111111111__1111111111
+    1111111111__1111111111111111__1111111111
+    1111111111__1111111111111111__1111111111
+
+#### End level map
+
+    1111111111111111111111111111111111111111
+    1111111111111111111111111111111111111111
+    1111_____1_____1_111_1_111_1_____11_1111
+    1111_111_1_111_1__11_1_111_1_111111_1111
+    1111____11_111_1_1_1_1_111_1_____11_1111
+    1111_111_1_111_1_11__1_111_11111_1111111
+    1111_____1_____1_111_1_____1_____11_1111
+    1111111111111111111111111111111111111111
+    1111111111111111111111111111111111111111
+    11__11__1111______111______111______1111
+    11__11__111___11___1___11___1___11___111
+    11__11__111__1111__1__1111__1__1111__111
+    11________1__1111__1__1111__1__1111__111
+    111111__111__1111__1__1111__1__1111__111
+    111111__111___11___1___11___1___11___111
+    111111__1111______111______111______1111
+    1111111111111111111111111111111111111111
+    1111111111111111111111111111111111111111
+    11_____1_____1_____1_111_1_____1_____111
+    11_111_1_111_111_111__11_111_111_1111111
+    11_____1_111_111_111_1_1_111_111_____111
+    11_11111_111_111_111_11__111_1111111_111
+    11_11111_____1_____1_111_111_111_____111
+    1111111111111111111111111111111111111111
+    1111111111111111111111111111111111111111
+
+#### End maze map
+
+    1111111111111111111111111111111111111111
+    1111111111111111111111111111111111111111
+    1111_____1_____1_111_1_111_1_____11_1111
+    1111_111_1_111_1__11_1_111_1_111111_1111
+    1111____11_111_1_1_1_1_111_1_____11_1111
+    1111_111_1_111_1_11__1_111_11111_1111111
+    1111_____1_____1_111_1_____1_____11_1111
+    1111111111111111111111111111111111111111
+    1111111111111111111111111111111111111111
+    111______111______111______111______1111
+    11___11___1___11___1___11___1___11___111
+    11__1111__1__1111__1__1111__1__1111__111
+    111______11__1111__1__1111__1__1111__111
+    11__1111__1__1111__1__1111__1__1111__111
+    11___11___1___11___1___11___1___11___111
+    111______111______111______111______1111
+    1111111111111111111111111111111111111111
+    1111111111111111111111111111111111111111
+    11_____1_____1_____1_111_1_____1_____111
+    11_111_1_111_111_111__11_111_111_1111111
+    11_____1_111_111_111_1_1_111_111_____111
+    11_11111_111_111_111_11__111_1111111_111
+    11_11111_____1_____1_111_111_111_____111
+    1111111111111111111111111111111111111111
+    1111111111111111111111111111111111111111
+
+#### Bonus map 1
+
+    1111111111111111111111111111111111111111
+    11_________1_______11_______1_________11
+    11_________1________1_______1_________11
+    11__11111__1__1111__1__111__1__1111___11
+    11__1______1__1__1_____1____1__1___1__11
+    11__1______1__1__1_____1____1__1___1__11
+    11__11111__1__1__1__1__111__1__1___1__11
+    11______1_____1_____1_______1__1___1__11
+    11______1_____1_____11______1__1___1__11
+    11__11111__1__1__1__111111_____1111___11
+    11_________1_____1____________________11
+    11________11____11_________111________11
+    11111__11111__1111__11__1111111__111__11
+    11__1_______11_______1__1__________1__11
+    11__1_______11_______1__1__________1__11
+    11__1__11111__11111111__1__111111__1__11
+    11_______11__________1_____________1__11
+    11_______1___________1_____________1__11
+    1111111__1__1111__1__1111__1__111__1__11
+    11_______1__1_____1________1__1____1__11
+    11_______1__1_____1_______11__1____1__11
+    11__111111__1__1__1__1111111__1__111__11
+    11_____________1___________________1__11
+    11_____________1___________________1__11
+    111111111111111111111111111111111111__11
+
+#### Bonus map 2
+
+    1111111111111111111111111111111111111111
+    11_________1_______11_______1_________11
+    11_________1_______1________1_________11
+    11__11111__1__111__1__1111__1__1111___11
+    11__1______1____1_____1__1__1__1___1__11
+    11__1______1____1_____1__1__1__1___1__11
+    11__11111__1__111__1__1__1__1__1___1__11
+    11______1__1_______1_____1_____1___1__11
+    11______1__1______11_____1_____1___1__11
+    11__11111_____111111__1__1__1__1111___11
+    11____________________1_____1_________11
+    11________111_________11____11________11
+    11__111__1111111__11__1111__11111__11111
+    11__1__________1__1_______11_______1__11
+    11__1__________1__1_______11_______1__11
+    11__1__111111__1__11111111__11111__1__11
+    11__1_____________1__________11_______11
+    11__1_____________1___________1_______11
+    11__1__111__1__1111__1__1111__1__1111111
+    11__1____1__1________1_____1__1_______11
+    11__1____1__11_______1_____1__1_______11
+    11__11___1__1111111__1__1__1__111111__11
+    11__1___________________1_____________11
+    11__1___________________1_____________11
+    11__111111111111111111111111111111111111
+
+#### Bonus map 3
+
+    1111111111111111111111111111111111111111
+    11____________________________________11
+    11____________________________________11
+    11__111111111111111__111111111111111__11
+    11________________1__1________________11
+    11________________1__1________________11
+    11__111111111111111__111111111111111__11
+    11__111__________________________111__11
+    11__11____________________________11__11
+    11__11__111__11111111111111__111__11__11
+    11______111__1_____11_____1__111______11
+    11______1____1_____11_____1____1______11
+    1111__111____1__1__11__1__1____111__1111
+    1111__1____111__1__11__1__111____1__1111
+    1111111____1____1__11__1____1____1111111
+    11111____111____1__11__1____111____11111
+    11111____1____111__11__111____1____11111
+    111____111____1____11____1____111____111
+    111____1____111____11____111____1____111
+    11___111____1____111111____1____111___11
+    11___1____111____1____1____111____1___11
+    11__11____1____11_1__1_11___11____11__11
+    11______111____1___11___1____111______11
+    11______111__111__1__1__111__111______11
+    11111111111__11111111111111__11111111111
+
+#### Bonus map 4
+
+    1111111111111111111111111111111111111111
+    11____________________________________11
+    11____________________________________11
+    11__111111111111111__111111111111111__11
+    11________________1__1________________11
+    11________________1__1________________11
+    11__111111111111111__111111111111111__11
+    11__111__________________________111__11
+    11__11____________________________11__11
+    11__11__111__11111111111111__111__11__11
+    11______111__1_____11_____1__111______11
+    11______1____1_____11_____1____1______11
+    1111__111____1__1__11__1__1____111__1111
+    1111__1____111__1__11__1__111____1__1111
+    1111111____1____1__11__1____1____1111111
+    11111____111____1__11__1____111____11111
+    11111____1____111__11__111____1____11111
+    111____111____1____11____1____111____111
+    111____1____111____11____111____1____111
+    11___111____1____111111____1____111___11
+    11___1____111____1____1____111____1___11
+    11__11____11___11_1__1_11____1____11__11
+    11______111____1___11___1____111______11
+    11______111__111__1__1__111__111______11
+    11111111111__11111111111111__11111111111
+
+#### Bonus map 5
+
+    1111111111111111111111111111111111111111
+    11_____1_____1__________11_____1__1__111
+    11_____1_____1___________1_____1_____111
+    11__1__1__1__1__1111__1__1__1__1_____111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1_____1__1__1_____1__1111_____1__111
+    11__1_____1_____1_____1____11_____1__111
+    11__1__1111_____1__1111_____1__1111__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1__1__1__1__1_____1__1__1__1__1__111
+    11__1__1__1__1__1_____1__1________1__111
+    11__1__1__1__1__1111__1__1________1__111
+    11__1__1__1__1____11__1__1__1__1__1__111
+    11_____1_____1_____1__1__1__1__1__1__111
+    11____11_____1__1__1__1__1__1__1__1__111
+    11__1111__1111__1__1_____1__1__1__1__111
+    11__1__1__1__1__1__1____11__1__1__1__111
+    11__1__1__1__1__1__1__1111__1__1__1__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1__1__1__1111__1__1__1__1__1111__111
+    11__1_____1_________________1________111
+    11__1_____1_________________11_______111
+    11111111111111111111111111111111__111111
+
+#### Bonus map 6
+
+    1111111111111111111111111111111111111111
+    11__1__1_____11__________1_____1_____111
+    11_____1_____1___________1_____1_____111
+    11_____1__1__1__1__1111__1__1__1__1__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1_____1111__1_____1_____1_____1__111
+    11__1_____11____1_____1_____1_____1__111
+    11__1111__1_____1111__1__1__1111__1__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1__1__1__1__1_____1__1__1__1__1__111
+    11__1________1__1_____1__1__1__1__1__111
+    11__1________1__1__1111__1__1__1__1__111
+    11__1__1__1__1__1__11____1__1__1__1__111
+    11__1__1__1__1__1__1_____1_____1_____111
+    11__1__1__1__1__1__1__1__1_____11____111
+    11__1__1__1__1_____1__1__1111__1111__111
+    11__1__1__1__11____1__1__1__1__1__1__111
+    11__1__1__1__1111__1__1__1__1__1__1__111
+    11__1__1__1__1__1__1__1__1__1__1__1__111
+    11__1111__1__1__1__1__1111__1__1__1__111
+    11________1_________________1_____1__111
+    11_______11_________________1_____1__111
+    11111__111111111111111111111111111111111
+
+#### Bonus map 7
+
+    1111111111111111111111111111111111111111
+    11____________________________________11
+    11____________________________________11
+    11__1111111111111__11111111111111111__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__1__1111111__11111111111111111__1__11
+    11__1__11____1__________________1__1__11
+    11__1__1_____1__________________1__1__11
+    11__1__1__1__11111111111111111__1__1__11
+    11__1__1__1__1__________________1__1__11
+    11__1__1__1__1__________________1__1__11
+    11__1__1__1__11111111111111111__1__1__11
+    11__1__1__1_____________________1__1__11
+    11__1__1__1_____________________1__1__11
+    11__1__1__1__11111111111111111__1__1__11
+    11__1__1__1_____________________1__1__11
+    11__1__1__1____________________11__1__11
+    11__1__1__1111111111111111111__11__1__11
+    11__1______________________________1__11
+    11__11____________________________11__11
+    11__1111__11111111111111111111111111__11
+    11____________________________________11
+    111__________________________________111
+    11111111__111111111111111111111111111111
+
+#### Bonus map 8
+
+    1111111111111111111111111111111111111111
+    11____________________________________11
+    11____________________________________11
+    11__11111111111111111__1111111111111__11
+    11__1______________________________1__11
+    11__1______________________________1__11
+    11__1__11111111111111111__1111111__1__11
+    11__1__1__________________1____11__1__11
+    11__1__1__________________1_____1__1__11
+    11__1__1__11111111111111111__1__1__1__11
+    11__1__1__________________1__1__1__1__11
+    11__1__1__________________1__1__1__1__11
+    11__1__1__11111111111111111__1__1__1__11
+    11__1__1_____________________1__1__1__11
+    11__1__1_____________________1__1__1__11
+    11__1__1__11111111111111111__1__1__1__11
+    11__1__1_____________________1__1__1__11
+    11__1__11____________________1__1__1__11
+    11__1__11__1111111111111111111__1__1__11
+    11__1______________________________1__11
+    11__11____________________________11__11
+    11__11111111111111111111111111__1111__11
+    11____________________________________11
+    111__________________________________111
+    111111111111111111111111111111__11111111
+
+#### Bonus map 9
+
+    1111111111111111111111111111111111111111
+    11__________1111_____________________111
+    11____________________________________11
+    11__111111________111__111111111__11__11
+    11_______1111111__1_1__11______1__11__11
+    11________________1_1__1_______1__11__11
+    11__111___________1_1__1__111__1__11__11
+    11____1111111111111_1_______1__1______11
+    111____________1____1_______1__1______11
+    1111___________111111__111111__11111__11
+    11_1__1111111__________1___________1__11
+    11_1__1_____1__________1___________1__11
+    11_1__1_____111__1111111__1111111111__11
+    1111__1111__________1_________________11
+    11______11__________1_________________11
+    11_______111111111__1111__1__11111111111
+    11__111________1_1__1_____1___________11
+    11__1_1________1_1__1_____1___________11
+    11__1_1__1__1__111__1__1111__1__1111__11
+    11__1_1__1__1__________1_____1_____1__11
+    11__1_1__1__11________11____11_____1__11
+    11__111__1__111111111111__1111111111__11
+    11_______1____________________________11
+    11_______1___________________________111
+    1111111111111111__1111111111111111111111
+
+#### Bonus map 10
+
+    1111111111111111111111111111111111111111
+    111_____________________1111__________11
+    11____________________________________11
+    11__11__111111111__111________111111__11
+    11__11__1______11__1_1__1111111_______11
+    11__11__1_______1__1_1________________11
+    11__11__1__111__1__1_1___________111__11
+    11______1__1_______1_1111111111111____11
+    11______1__1_______1____1____________111
+    11__11111__111111__111111___________1111
+    11__1___________1__________1111111__1_11
+    11__1___________1__________1_____1__1_11
+    11__1111111111__1111111__111_____1__1_11
+    11_________________1__________1111__1111
+    11_________________1__________11______11
+    11111111111__1__1111__111111111_______11
+    11___________1_____1__1_1________111__11
+    11___________1_____1__1_1________1_1__11
+    11__1111__1__1111__1__111__1__1__1_1__11
+    11__1_____1_____1__________1__1__1_1__11
+    11__1_____11____11________11__1__1_1__11
+    11__1111111111__111111111111__1__111__11
+    11____________________________1_______11
+    111___________________________1_______11
+    1111111111111111111111__1111111111111111
+
+#### Bonus map 11
+
+    1111111111111111111111111111111111111111
+    11__________111_______________________11
+    11__________11________________________11
+    111111__11__11__1111111111__11111111__11
+    11_______1__11___________1_________1__11
+    11_______________________1____________11
+    11__111_________1111__1__1__11111_____11
+    11____1__11111_____1__1__1_________1__11
+    11____1______1________1__1________11__11
+    1111__1______1__1_____1_____1__1__11__11
+    11_______11__1__1__1__1_____1__1__1___11
+    11_______11__1_____1__1__1__1__1_____111
+    1111__1__11__1_____1__1111__1__1_____111
+    1111____________1______________1__1__111
+    1111___________11_____________11__1__111
+    1111__1111__11111__1__111111__11__1__111
+    11______11______1________1____________11
+    11_______1______1________1____________11
+    11__111__1__11__1111111__1__1__11111__11
+    11____1_____1_________1__1__1_________11
+    11____1_____1_________1__1__1_________11
+    11__111__1__1111111__11__1__11111111__11
+    11_______1_______________1____________11
+    11_______11_____________111___________11
+    1111111111111__1111111111111111111111111
+
+#### Bonus map 12
+
+    1111111111111111111111111111111111111111
+    11_______________________111__________11
+    11________________________11__________11
+    11__11111111__1111111111__11__11__111111
+    11__1_________1___________11__1_______11
+    11____________1_______________________11
+    11_____11111__1__1__1111_________111__11
+    11__1_________1__1__1_____11111__1____11
+    11__11________1__1________1______1____11
+    11__11__1__1_____1_____1__1______1__1111
+    11___1__1__1_____1__1__1__1__11_______11
+    111_____1__1__1__1__1_____1__11_______11
+    111_____1__1__1111__1_____1__11__1__1111
+    111__1__1______________1____________1111
+    111__1__11_____________11___________1111
+    111__1__11__111111__1__11111__1111__1111
+    11____________1________1______11______11
+    11____________1________1______1_______11
+    11__11111__1__1__1111111__11__1__111__11
+    11_________1__1__1_________1_____1____11
+    11_________1__1__1_________1_____1____11
+    11__11111111__1__11__1111111__1__111__11
+    11____________1_______________1_______11
+    11___________111_____________11_______11
+    1111111111111111111111111__1111111111111
+
+#### Bonus map 13
+
+    1111111111111111111111111111111111111111
+    11____________________________________11
+    11____________________________________11
+    11__111111111111111111111111111111111_11
+    11____________________________________11
+    11____________________________________11
+    11_111111111111111111111111111111111__11
+    11______1______________________1______11
+    11______1______________________1______11
+    111111__1__11111__1111__11111__1__111111
+    11_________1___1__1__1__1___1_________11
+    11________11___1__1__1__1___1_________11
+    11__11111111__11__1__1__11__11111111__11
+    11__11____________________________11__11
+    11__1______________________________1__11
+    11__1__1111111__111__111__1111111__1__11
+    11_____1_____1__1______1__1____11_____11
+    11_____1_____1__1______1__1_____1_____11
+    11__1111__1__1__1__11__1__1__1__1111__11
+    11________1__1__1______1__1__1________11
+    11________1_____1______1_____1________11
+    11__1111__1_____1__11__1_____1__1111__11
+    11________1__1_____11_____1__1________11
+    11_______11__1____1111____1__1_______111
+    11111__111111111111111111111111111111111
+
+#### Bonus map 14
+
+    1111111111111111111111111111111111111111
+    11____________________________________11
+    11____________________________________11
+    11_111111111111111111111111111111111__11
+    11____________________________________11
+    11____________________________________11
+    11__111111111111111111111111111111111_11
+    11______1______________________1______11
+    11______1______________________1______11
+    111111__1__11111__1111__11111__1__111111
+    11_________1___1__1__1__1___1_________11
+    11_________1___1__1__1__1___11________11
+    11__11111111__11__1__1__11__11111111__11
+    11__11____________________________11__11
+    11__1______________________________1__11
+    11__1__1111111__111__111__1111111__1__11
+    11_____11____1__1______1__1_____1_____11
+    11_____1_____1__1______1__1_____1_____11
+    11__1111__1__1__1__11__1__1__1__1111__11
+    11________1__1__1______1__1__1________11
+    11________1_____1______1_____1________11
+    11__1111__1_____1__11__1_____1__1111__11
+    11________1__1_____11_____1__1________11
+    111_______1__1____1111____1__11_______11
+    111111111111111111111111111111111__11111
+
+#### Bonus map 15
+
+    1111111111111111111111111111111111111111
+    11_____1__1______________1____________11
+    11_____1__1______________1____________11
+    11__1111__1__1111__1111__1__1__11111__11
+    11_________________11_______1_________11
+    11_________________1________1_________11
+    11__1111__1111__1__1__1__1111__1__1__111
+    11__1_____1_____1______________1__1__111
+    11__1____11_____1______________1__1__111
+    11__1__1111__1__1111__1111111111__1__111
+    11___________1________1_______________11
+    11___________1________1_______________11
+    11111__1111__1__1__1__1__1__11111111__11
+    11_____1__1_____1__1_____1_________1__11
+    11_____1__1_____1__1_____1_________1__11
+    11__1__1__1__1111__1111__1__11111__11111
+    11__1_____1________1_____1__1_________11
+    11__1_____1________1____11__1_________11
+    11__1__1111__1111__1__1111111__11111__11
+    11_____1_____1_____1___________1______11
+    11_____1_____1____11__________11______11
+    11__1__1111111__1111__1111__1111__11__11
+    11__1_________________1___________1___11
+    11__11________________1___________1___11
+    11111111__111111111111111111111111111111
+
+#### Bonus map 16
+
+    1111111111111111111111111111111111111111
+    11____________1______________1__1_____11
+    11____________1______________1__1_____11
+    11__11111__1__1__1111__1111__1__1111__11
+    11_________1_______11_________________11
+    11_________1________1_________________11
+    111__1__1__1111__1__1__1__1111__1111__11
+    111__1__1______________1_____1_____1__11
+    111__1__1______________1_____11____1__11
+    111__1__1111111111__1111__1__1111__1__11
+    11_______________1________1___________11
+    11_______________1________1___________11
+    11__11111111__1__1__1__1__1__1111__11111
+    11__1_________1_____1__1_____1__1_____11
+    11__1_________1_____1__1_____1__1_____11
+    11111__11111__1__1111__1111__1__1__1__11
+    11_________1__1_____1________1_____1__11
+    11_________1__11____1________1_____1__11
+    11__11111__1111111__1__1111__1111__1__11
+    11______1___________1_____1_____1_____11
+    11______11__________11____1_____1_____11
+    11__11__1111__1111__1111__1111111__1__11
+    11___1___________1_________________1__11
+    11___1___________1________________11__11
+    111111111111111111111111111111__11111111
+
