@@ -112,7 +112,8 @@ as freely distributable online (although of historical note, it refers to dialup
 modem bulletin board systems, as the World Wide Web did not exist in 1991).
 
 The source code is given here as a powerpacked file, since it's 203,112 bytes
-unpacked. You can unpack it by running PowerPatcher and copying the file.
+unpacked. You can unpack it with xfdDecrunch, which can unpack most Amiga
+compressed formats.
 
 Winstanley appears to have created MatchPatch single-handedly. The title screen
 credits "SD" with both ideas and code. The high score chart also credits the
