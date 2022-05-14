@@ -5,10 +5,11 @@ categories: guide
 
 Ghidra is a powerful reverse-engineering tool created by the NSA and released to
 the public in 2019. It's capable of handling 68000 code, which means it can be
-used to analyze Amiga software and games. However, it can be tricky to use at
-first, so 
+used to analyze Amiga software and games. However, it can be tricky to get the
+hang of at first. This introductory guide should give you a start.
 
-This is only an introductory guide.
+See also [Reverse-engineering Amiga games](../reverse-engineering-amiga.html)
+for Amiga-specific advice other than using Ghidra.
 
 1. Table of Contents
 {:toc}
@@ -69,6 +70,21 @@ option. You can also individually run features in Analysis - One Shot, such as
 Aggressive Instruction Finder.
 
 Save (Ctrl-S).
+
+### Basics of analysis
+
+Disassembly will convert an program executable back into _assembly language_.
+It was standard practice for Amiga game developers to strip the list of variable
+and function names (called the _symbol table_) from the finished program. Making
+sense of such a disassembly usually involves a lot of manually following the
+code to give names back to things so it's clearer what they mean.
+
+In Ghidra, if you rename a variable or change its type, it's automatically
+updated everywhere in the program. You can set a variable name, then click the
+references to see what code reads or writes it, and that will in turn give you a
+clue what to name that function, and so on. It also helps to add comments.
+
+See also [Reverse-engineering Amiga games](../reverse-engineering-amiga.html).
 
 ### User interface
 
@@ -179,20 +195,52 @@ before, the line after, at the end of the line, etc. Ctrl-Enter submits the
 comment. Commenting the code is really useful for reminding yourself what
 something does.
 
+T
+: Type. Set data type on some data (i.e. not an instruction). You can also
+right-click and select the Data menu. Common Amiga types include `byte`, `word`
+(two bytes), `long` (four bytes), `pointer` (four bytes referencing a memory
+location), `char` (one byte ascii character), and `string` (unlimited length
+series of ascii bytes). You can also enter your own custom structs or enums
+created in the Data Type Manager, or arrays (e.g. `char[10]`), or pointers to
+specific types (e.g. for a pointer to a long, instead of just `pointer`, you can
+write `long*`).
+
 Y
 : Set data type to the last selected data type. Useful if you need to set the
 type on a lot of strings, say. Right-click on the first string and select Data -
 string. For each other string, simply click on them and hit Y.
 
+[
+: Create an array from a selected area. Set the type first, so that you create
+an array of that type.
+
+E
+: Equate. Set the type of a parameter in an instruction. Useful for setting your
+own custom enum entries; e.g. instead of `tst.b (0x4,A0)` you can equate the 0x4
+to your ShipID type and have it read `tst.b (scoutship,A0)`. For standard types
+(e.g. unsigned decimal), you can also right-click and select Convert.
+
 F
 : Define the current line as the start of a Function. If used on an existing
-Function, it opens a useful function definition editor.
+Function, it opens a useful function definition editor. If the decompile window
+is greyed out, you may want to define a function.
+
+B
+: Set the type of a variable to `byte`. Hit it again to set it to `word` (two
+bytes).
+
+P
+: Set type to `pointer`.
 
 Ctrl-Down / Ctrl-Up
 : Go to the next and previous function in the code.
 
 Various other shortcuts are defined in the
-[Ghidra Cheat Sheet](https://ghidra-sre.org/CheatSheet.html).
+[Ghidra Cheat Sheet](https://ghidra-sre.org/CheatSheet.html). You can also
+define your own shortcuts in Edit - Tool Options - Key Bindings. For example,
+you might bind D to equate unsigned decimal. Even though D is already
+Disassemble, you can still bind it and Ghidra will work out from context which
+one you meant.
 
 ### Advanced features
 
@@ -201,7 +249,7 @@ Often, software will have jump tables, which are a list of pointers to
 functions.
 
 Right click on a number and select "convert" to display it in a different
-format, such as decimal rathe than hexadecimal.
+format, such as decimal rather than hexadecimal.
 
 Ghidra currently appears unable to import the symbol table (the list of variable
 and function names ) from an Amiga executable. This isn't a huge deal, since
@@ -225,6 +273,8 @@ stack, but I've noticed functions which take their input values from registers
 plus to add new lines referencing data which this function takes. The main use
 of this is the C decompilation code makes more sense.
 
+### Custom datatypes
+
 Another useful thing is to establish an enum, which is essentially a custom Data
 Type which converts numbers into names. Suppose your game has a variable for
 currently equipped weapon, something like 0=Unarmed, 1=Dagger, 2=Sword, 3=Axe.
@@ -234,25 +284,66 @@ each row with its name and automatically incrementing value. Give your enum a
 name and click the blue disk icon to save. You now have effectively a custom
 data type.
 
+The quickest way I've found to add a number of enums is to click the green plus
+icon several times to create the desired number of entries, then go through the
+list and hit F2 on each field to name it. This saves you switching between mouse
+and keyboard between each entry. However, for especially large enums, you might
+create a C typedef file and import it with File - Parse C Source. For example,
+create and import a file named `weapon.h` like below:
+
+```
+typedef enum Weapon {
+  Unarmed=0,
+  Dagger=1,
+  Sword=2,
+  Axe=3
+} Weapon ;
+```
+
 You can similarly define composite data types called structs. Suppose each ship
 in a game is stored in 24 bytes, with the first byte always storing the ship's
 Armour value, the second byte its Speed, and so on. You can define a struct to
-represent that pattern.
+represent that pattern. Like with enum, right-click the program name in the Data
+Type Manager and select New - Structure. In the Structure Editor, enter the Size
+of your struct in bytes and a name, and press F2 on the DataType and Name fields
+to edit the type and name of known byte offsets. You can, of course, use your
+custom enums and arrays as types. If you need to erase a row, press C or click
+the erase icon; don't hit Delete, as it will remove the row and change the
+number of all subsequent offsets, which you probably don't want. Click the blue
+disk icon to save.
+
+Amiga software often used a data structure known as a bitfield, which stored a
+flag in each bit of a byte. The struct editor can also add bitfields, although
+the UI is a little clunky. Right-click on an empty row and click Add Bitfield.
+Set the Base Datatype to `byte` and the Allocation Bytes to 1. Enter your field
+name, select the Bit Offset for this bit, and click OK. To add another bit,
+right-click the same row, click Add Bitfield, and enter the field name and
+offset for that new bit. The quickest way I've found to add eight bits is to
+bind a key (e.g. T) to Add Bitfield, set it to type Byte and 1 byte, hit OK,
+then 7 more times hit T, click the next bit in the Component Bits, and click OK.
+You can then go back and edit the names of those bits by pressing F2 as normal.
+The bits are ordered from the largest first; i.e. bit 7 will be at the top and
+bit 0 at the bottom.
 
 Where enums and structs come in handy is that you can use them anywhere you'd
 normally select a type, such as variable types or function parameters. Press T
 to set the type of a variable and just type the name of the enum or struct you
 defined. Press F on a function edit its signature and add your custom type as
-one of its parameters. Now, the Decompile panel will show your type
-automatically. You can also name pointers this way; e.g. if a variable always
-contains a pointer to a Ship, just hit T and type `Ship*`.
+one of its parameters (you will need to select Use Custom Storage). Now, the
+Decompile panel will show your type automatically. Press E to equate an
+instruction parameter to an enum. You can also name pointers this way; e.g. if a
+variable always contains a pointer to a Ship, just hit T and type `Ship*`.
 
 You can also set an array as a type, or even a two-dimensional array (i.e. a
 table of data). For example, the game K240 stores a table of up to four
 blueprints given for free when fighting each of six aliens, with each blueprint
 represented by a one-byte number. After naming all the blueprints in an enum, I
 simply hit T on the starting blueprint table variable and set it to
-`Blueprint[6][4]`.
+`Blueprint[6][4]`. If you don't need an enum in this case, you could use
+`byte[6][4]`.
+
+If you accidentally give two things the same name, Ghidra will contine to track
+them correctly and won't confuse the two.
 
 ### Other advice and methods
 
@@ -272,7 +363,8 @@ These are Amiga hardware addresses. You can import them using the
 These hardware addresses are often a really good way to identify whch parts of
 code are dealing with key system functions like graphics, sound, or input.
 For more detail on their meaning, see 
-[Mapping the Amiga](https://textfiles.meulie.net/programming/AMIGA/mapamiga.txt).
+[Mapping the Amiga](https://textfiles.meulie.net/programming/AMIGA/mapamiga.txt)
+or [m68k-instructions-documentation](https://github.com/prb28/m68k-instructions-documentation).
 
 Particular to note is `DFF006`, `VHPOSR`, "Vertical/Horizontal Beam Position
 Read", which is often used to seed the random number generator. Random numbers

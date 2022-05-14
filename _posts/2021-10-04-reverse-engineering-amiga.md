@@ -28,6 +28,12 @@ Just as an _assembler_ once turned the original programmer's source code into an
 executable program, a tool called a _disassembler_ can recreate the source code
 from the program (though with certain limitations).
 
+Even games written in other languages like C or AMOS Basic will be reversed to
+assembly language. There's no known way to reverse a compiled AMOS program back
+into AMOS (and its assembly output is really ugly).
+
+#### IRA
+
 One of the best Amiga-specific disassemblers is the freeware tool
 [IRA](https://ftp.uni-erlangen.de/aminet/dev/asm/ira.lha). This runs natively on
 Amiga, but it can also be compiled for Windows, Mac and Linux, which is
@@ -55,18 +61,24 @@ from hexadecimal $41 to $7A are often unidentified ASCII text. The `-A` option
 is good for helping you to familiarize ourself with the numeric equivalents of
 instructions.
 
-Even games written in other languages like C or AMOS Basic will be reversed to
-assembly language. [Ghidra](https://ghidra-sre.org) is another reversing tool
-which has some ability to reverse a C program back into C, and this is useful
-for later platforms which tended to use C (especially PlayStation).  However,
-"decompiling" an assembly game into C isn't really meaningful since it wasn't
-written in C. There's no known way to reverse a compiled AMOS program back into
-AMOS (and its assembly output is really ugly).
-
 See also this EAB thread on using IRA:
 [Small IRA Tutorial](https://eab.abime.net/showthread.php?t=101408).
-An [Amiga loader for Ghidra](https://github.com/lab313ru/ghidra_amiga_ldr)
-is available, but at current, IRA is still better suited to handling Amiga.
+
+#### Ghidra
+
+[Ghidra](https://ghidra-sre.org) is a powerful reverse-engineering tool released
+in 2019. It can handle the the 68000 platform, and thanks to a plugin called
+[ghidra_amiga_ldr](https://github.com/lab313ru/ghidra_amiga_ldr), it can
+specifically handle Amiga executable files. It can also interpret disassembled
+code as C, which won't give you an accurate representation of the game's source
+code if it was originally written in Assembly (as most Amiga games were), but it
+can give you a representation of the code in a high-level language that may aids
+understanding of the program if you're more familiar with C-inspired languages
+like Java.
+
+As of May 2022, Ghidra is now my preferred tool for analyzing Amiga games. I've
+written an introductory tutorial to using Ghidra for this purpose:
+[Intro to Amiga reverse-engineering with Ghidra](../intro-amiga-ghidra.html).
 
 ### Introductory analysis
 
