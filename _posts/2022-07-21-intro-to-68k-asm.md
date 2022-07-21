@@ -77,24 +77,28 @@ conditions are met; otherwise, set to 0:
 
 X
 : Extend.
+
 N
 : Negative. Set if the result of the last calculation is negative, meaning
 specifically that the most significant bit (i.e. leftmost bit) is set to 1. For
 example, if a byte is `0000 0000` (i.e. decimal value of 0) and you subtract
 one, it will set the byte to `1111 1111` (i.e. 255 or -1) and set the N flag.
+
 Z
 : Zero. Set if the result is zero.
+
 V
 : Overflow. Set if the result is too big to fit in the value; e.g. trying to
 store a number larger than 255 in a byte.
+
 C
 : Carry.
 
 ### Addresses and labels
 
 Each byte of memory is referred to by a numeric location, known as its address.
-The very first byte in memory is `$0000 0000`, the second is `$0000 0001`, and
-so on.
+The very first byte in memory is referred to by the address `$0000 0000`, the
+second is `$0000 0001`, and so on.
 
 Any line in a program can be prefixed with a label, which can be used throughout
 the program as a convenient synonym for that location in memory. This works much
@@ -219,7 +223,7 @@ Like AND, but give an immediate value.
 Arithmetic shift left. Essentially multiplies the value by 2<sup>n</sup>. The
 first value is the number of times shifted, and the second is a data register.
 The Python equivalent is `<<`. For example, to multiply the value in D0 by
-2<sup>4<sup> (16), equivalent to D0 << 4:
+2<sup>4</sup> (16), equivalent to D0 << 4:
 
 ```
     ASL.W  #4,D0
@@ -263,18 +267,25 @@ BEQ
 : Branch if equal to zero (Z set). Often used in conjunction with TST or
 CMP. BEQ can also be thought of as "branch if equal", since for example `CMP.L
 D0,D1` will set Z if both are equal, thus causing a subsequent BEQ to branch.
+
 BNE
 : Branch if not equal (Z unset). Inverse of BEQ.
+
 BMI
 : Branch if minus (N set).
+
 BPL
 : Branch if positive (N unset). Zero counts as positive.
+
 BGT
 : Branch if greater than zero.
+
 BLT
 : Branch if less than zero.
+
 BGE
 : Branch if greater than or equal to zero.
+
 BLE
 : Branch if less than or equal to zero.
 
