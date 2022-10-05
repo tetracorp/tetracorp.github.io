@@ -534,13 +534,14 @@ depending on whether the byte is zero, i.e. false.
 
 ### Further reading
 
+- [How Machine Language Works](https://www.youtube.com/watch?v=HWpi9n2H3kE) (YouTube)
+- [Bowen's 68000 Summary Card](https://textfiles.vistech.net/programming/CARDS/68000)
 - [MarkeyJester's Motorola 68000 Beginner's Tutorial](https://mrjester.hapisan.com/04_MC68/)
 - [m68k-instructions-documentation](https://github.com/prb28/m68k-instructions-documentation)
 - [68k.hax.com](https://web.archive.org/web/20160416075724/http://68k.hax.com/)
 - [MC680x0 Reference 1.1](https://oldwww.nvg.ntnu.no/amiga/MC680x0_Sections/index.HTML)
 - [Motorola M68000 Family Programmer's Reference Manual](https://www.nxp.com/docs/en/reference-manual/M68000PRM.pdf) (PDF)
 - [Crash course to Amiga assembly programming](https://www.reaktor.com/blog/crash-course-to-amiga-assembly-programming/)
-- [Bowen's Instruction Summary Cards](https://textfiles.meulie.net/programming/CARDS/)
 - [How to Work with Motorola 68000 assembly](https://info.sonicretro.org/SCHG_How-to:Work_with_Motorola_68000_assembly)
 - [Tutorials of The Complete Amiga 68000 Assembly Hardware Programming & Development Course](https://www.youtube.com/playlist?list=PL-i3KPjyWoghwa9ZNAfiKQ-1HGToHn9EJ) (YouTube)
 - [MatchPatch](https://github.com/tetracorp/matchpatch-amiga), a contemporary
