@@ -25,6 +25,8 @@ loading the [Amiga Hunk](https://en.wikipedia.org/wiki/Amiga_Hunk) executable
 format. Download the
 [latest release](https://github.com/lab313ru/ghidra_amiga_ldr/releases), but
 don't unzip it. Note which version it is for (e.g. "GHIDRA 10.1.1 PUBLIC").
+Recently there's a [fork of ghidra_amiga_ldr](https://github.com/BartmanAbyss/ghidra-amiga)
+by BartmanAbyss which is newer, although I haven't tested it yet.
 
 Go to the 
 [Ghidra release page](https://github.com/NationalSecurityAgency/ghidra/releases)
