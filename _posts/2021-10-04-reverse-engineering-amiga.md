@@ -78,7 +78,7 @@ like Java.
 
 As of May 2022, Ghidra is now my preferred tool for analyzing Amiga games. I've
 written an introductory tutorial to using Ghidra for this purpose:
-[Intro to Amiga reverse-engineering with Ghidra](../intro-amiga-ghidra.html).
+[Intro to Amiga reverse-engineering with Ghidra](../guide/intro-amiga-ghidra.html).
 
 ### Introductory analysis
 
