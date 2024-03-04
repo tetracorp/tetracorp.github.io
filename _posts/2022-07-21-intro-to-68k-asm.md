@@ -15,7 +15,7 @@ reading list appears at the end of the article who wish to learn in more detail.
 ### Introduction
 
 According to [The Art of War](https://www.gutenberg.org/ebooks/132), all warfare
-is based on deception. When are forces are weaker than the enemy, we must make
+is based on deception. When our forces are weaker than the enemy, we must make
 him think we are stronger (so that he will not attack us); when we are stronger,
 we must make him think we are weaker (so that he underestimates us), and so on.
 By these means, the enemy's plans will be predicated on inaccurate information,
