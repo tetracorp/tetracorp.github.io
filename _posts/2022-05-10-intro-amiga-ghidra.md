@@ -8,7 +8,7 @@ the public in 2019. It's capable of handling 68000 code, which means it can be
 used to analyze Amiga software and games. However, it can be tricky to get the
 hang of at first. This introductory guide should give you a start.
 
-See also [Reverse-engineering Amiga games](../reverse-engineering-amiga.html)
+See also [Reverse-engineering Amiga games](../guide/reverse-engineering-amiga.html)
 for Amiga-specific advice other than using Ghidra.
 
 1. Table of Contents
@@ -86,7 +86,7 @@ updated everywhere in the program. You can set a variable name, then click the
 references to see what code reads or writes it, and that will in turn give you a
 clue what to name that function, and so on. It also helps to add comments.
 
-See also [Reverse-engineering Amiga games](../reverse-engineering-amiga.html).
+See also [Reverse-engineering Amiga games](../guide/reverse-engineering-amiga.html).
 
 ### User interface
 
