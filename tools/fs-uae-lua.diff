@@ -1,0 +1,2674 @@
+diff --git a/Makefile.am b/Makefile.am
+index 0219ac91c..fe863e869 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -372,6 +372,7 @@ libuae_a_SOURCES = \
+ 	src/include/isofs_api.h \
+ 	src/include/keyboard.h \
+ 	src/include/keybuf.h \
++	src/include/lualibuae.h \
+ 	src/include/luascript.h \
+ 	src/include/mackbd.h \
+ 	src/include/mmu_common.h \
+@@ -642,6 +643,7 @@ libfsemu_a_SOURCES = \
+ 	libfsemu/include/fs/defines.h \
+ 	libfsemu/include/fs/emu.h \
+ 	libfsemu/include/fs/emu/actions.h \
++	libfsemu/include/fs/emu_lua.h \
+         libfsemu/include/fs/emu/audio.h \
+         libfsemu/include/fs/emu/benchmark.h \
+         libfsemu/include/fs/emu/buffer.h \
+@@ -669,6 +671,7 @@ libfsemu_a_SOURCES = \
+ 	libfsemu/include/fs/ml.h \
+ 	libfsemu/include/fs/ml/opengl.h \
+ 	libfsemu/include/fs/ml/options.h \
++	libfsemu/include/fs/net.h \
+ 	libfsemu/include/fs/ref.h \
+ 	libfsemu/include/fs/thread.h \
+ 	libfsemu/include/fs/time.h \
+@@ -693,7 +696,6 @@ libfsemu_a_SOURCES = \
+ 	libfsemu/src/emu/dialog.c \
+ 	libfsemu/src/emu/dialog.h \
+ 	libfsemu/src/emu/emu.c \
+-	libfsemu/src/emu/emu_lua.h \
+ 	libfsemu/src/emu/font.c \
+ 	libfsemu/src/emu/font.h \
+ 	libfsemu/src/emu/hud.c \
+@@ -702,6 +704,8 @@ libfsemu_a_SOURCES = \
+ 	libfsemu/src/emu/input.h \
+ 	libfsemu/src/emu/keynames.c \
+ 	libfsemu/src/emu/libfsemu.h \
++	libfsemu/src/emu/lua_shell.c \
++	libfsemu/src/emu/lua_shell.h \
+ 	libfsemu/src/emu/menu.c \
+ 	libfsemu/src/emu/menu.h \
+ 	libfsemu/src/emu/netplay.c \
+@@ -926,6 +930,7 @@ if WITH_LUA
+ noinst_LIBRARIES += liblua.a
+ AM_CPPFLAGS += -I$(s)/lua/src
+ fs_uae_LDADD += liblua.a
++fs_uae_device_helper_LDADD += liblua.a
+ liblua_a_SOURCES = \
+ 	lua/src/lapi.c \
+ 	lua/src/lapi.h \
+@@ -984,8 +989,9 @@ liblua_a_SOURCES = \
+ 	lua/src/lzio.c \
+ 	lua/src/lzio.h
+ fs_uae_SOURCES += \
+-	src/fs-uae/luascript.c \
+-	src/luascript.cpp
++	src/fs-uae/lualibfsuae.c \
++	src/luascript.cpp \
++	src/lualibuae.cpp
+ libfsemu_a_SOURCES += \
+ 	libfsemu/src/emu/emu_lua.c
+ endif
+diff --git a/libfsemu/include/fs/emu.h b/libfsemu/include/fs/emu.h
+index b9e78a93b..64441bd32 100644
+--- a/libfsemu/include/fs/emu.h
++++ b/libfsemu/include/fs/emu.h
+@@ -7,6 +7,7 @@
+ #include <fs/log.h>
+ #include <fs/conf.h>
+ #include <fs/ml.h>
++#include <fs/emu_lua.h>
+ 
+ #if 0
+ 
+@@ -35,15 +36,6 @@
+ extern "C" {
+ #endif
+ 
+-#ifdef WITH_LUA
+-#include <lauxlib.h>
+-lua_State *fs_emu_get_lua_state(void);
+-void fs_emu_acquire_lua(void);
+-void fs_emu_release_lua(void);
+-#endif
+-
+-void fs_emu_lua_run_handler(const char *name);
+-
+ // Can (or should) be called before fs_emu_init
+ 
+ #define fse_log fs_log
+diff --git a/libfsemu/include/fs/emu_lua.h b/libfsemu/include/fs/emu_lua.h
+new file mode 100644
+index 000000000..bec55dc59
+--- /dev/null
++++ b/libfsemu/include/fs/emu_lua.h
+@@ -0,0 +1,39 @@
++#ifndef LIBFSEMU_EMU_LUA_H_
++#define LIBFSEMU_EMU_LUA_H_
++
++#ifdef WITH_LUA
++
++#include <lauxlib.h>
++
++typedef struct fs_emu_lua_binding {
++    int (*run_handler)(const char *name);
++    int (*run_script)(const char *path);
++    lua_State *(*create_state)(void);
++    void (*destroy_state)(lua_State *);
++    void (*lock_state)(lua_State *);
++    void (*unlock_state)(lua_State *);
++} fs_emu_lua_binding;
++
++typedef int (*fs_emu_lua_func)(lua_State *);
++
++// bind lua interpreter
++extern void fs_emu_lua_set_binding(fs_emu_lua_binding *);
++extern void fs_emu_lua_bind(void);
++extern void fs_emu_lua_unbind(void);
++
++// register functions
++extern void fs_emu_lua_init(void);
++extern void fs_emu_lua_register_func(const char *name, fs_emu_lua_func f);
++extern int luaopen_fsemulib(lua_State *state);
++
++extern lua_State *fs_emu_lua_create_state(void);
++extern void fs_emu_lua_destroy_state(lua_State *);
++extern void fs_emu_lua_lock_state(lua_State *);
++extern void fs_emu_lua_unlock_state(lua_State *);
++
++#endif
++
++extern int fs_emu_lua_run_handler(const char *name);
++extern int fs_emu_lua_run_script(const char *path);
++
++#endif // LIBFSEMU_EMU_LUA_H_
+diff --git a/libfsemu/include/fs/net.h b/libfsemu/include/fs/net.h
+new file mode 100644
+index 000000000..58ad92f06
+--- /dev/null
++++ b/libfsemu/include/fs/net.h
+@@ -0,0 +1,11 @@
++#ifdef WINDOWS
++#include <Winsock2.h>
++#include <Ws2tcpip.h>
++#else
++#include <sys/types.h>
++#include <sys/socket.h>
++#include <netdb.h>
++#include <netinet/in.h>
++#include <netinet/tcp.h>
++#include <unistd.h>
++#endif
+diff --git a/libfsemu/src/emu/emu.c b/libfsemu/src/emu/emu.c
+index e9d1f7a0c..5da9d6ee5 100644
+--- a/libfsemu/src/emu/emu.c
++++ b/libfsemu/src/emu/emu.c
+@@ -22,6 +22,7 @@
+ #include <fs/ml.h>
+ #include <fs/thread.h>
+ #include <fs/time.h>
++#include <fs/emu_lua.h>
+ 
+ #ifdef USE_GLIB
+ #include <glib.h>
+@@ -29,7 +30,6 @@
+ 
+ #include "audio.h"
+ #include "dialog.h"
+-#include "emu_lua.h"
+ #include "hud.h"
+ #include "input.h"
+ #include "libfsemu.h"
+diff --git a/libfsemu/src/emu/emu_lua.c b/libfsemu/src/emu/emu_lua.c
+index eb16ebc50..0b558d50b 100644
+--- a/libfsemu/src/emu/emu_lua.c
++++ b/libfsemu/src/emu/emu_lua.c
+@@ -4,38 +4,36 @@
+ 
+ #ifdef WITH_LUA
+ 
++#include <string.h>
++
+ #include <fs/emu.h>
+-#include "emu_lua.h"
++#include <fs/emu_lua.h>
+ #include <fs/log.h>
+ #include <fs/thread.h>
++#include "lua_shell.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
+ #include <lualib.h>
++#ifdef __cplusplus
++}
++#endif
+ 
+-static fs_mutex *g_mutex;
+-lua_State *fs_emu_lua_state = NULL;
++#define MAX_LUA_FUNCS   32
++typedef struct lua_func {
++    const char *name;
++    fs_emu_lua_func func;
++} lua_func;
+ 
+-void fs_emu_lua_run_handler(const char *name) {
+-    lua_State **L = &fs_emu_lua_state;
+-    while(*L) {
+-        fs_emu_acquire_lua();
+-        lua_getglobal(*L, name);
+-        if (lua_isnil(*L, -1)) {
+-            //lua_pop(*L, 1);
+-        }
+-        else if (lua_pcall(*L, 0, 0, 0) != 0) {
+-            fs_emu_lua_log_error(name);
+-            //lua_pop(*L, 1);
+-        }
+-        lua_settop(*L, 0);
+-        fs_emu_release_lua();
++#define MAX_POSTPONED_HANDLERS     16
++static const char *g_postponed_handlers[MAX_POSTPONED_HANDLERS];
++static int g_num_postponed_handlers;
+ 
+-        //L++;
+-        break;
+-    }
+-}
+-
+-lua_State *fs_emu_get_lua_state(void) {
+-    return fs_emu_lua_state;
+-}
++static int g_num_func = 0;
++static lua_func g_func_table[MAX_LUA_FUNCS];
++static fs_emu_lua_binding *g_binding = NULL;
++static int g_is_bound = 0;
+ 
+ static int l_fs_emu_log(lua_State *L) {
+     int n = lua_gettop(L);
+@@ -49,32 +47,157 @@ static int l_fs_emu_log(lua_State *L) {
+     return 0;
+ }
+ 
+-void fs_emu_lua_log_error(const char *msg) {
+-    fs_log("%s: %s\n", msg, lua_tostring(fs_emu_lua_state, -1));
+-    printf("%s: %s\n", msg, lua_tostring(fs_emu_lua_state, -1));
++void fs_emu_lua_init(void) {
++    fs_log("lua-fs: init\n");
++    fs_emu_lua_register_func("log", l_fs_emu_log);
++}
++
++void fs_emu_lua_set_binding(fs_emu_lua_binding *b)
++{
++    g_binding = b;
+ }
+ 
+-void fs_emu_acquire_lua(void) {
+-    fs_mutex_lock(g_mutex);
++void fs_emu_lua_bind(void)
++{
++    if((g_binding != NULL) && !g_is_bound) {
++        g_is_bound = 1;
++        fs_log("lua-fs: bound to emu\n");
++
++        // recall postponed handlers?
++        for(int i=0;i<g_num_postponed_handlers;i++) {
++            const char *name = g_postponed_handlers[i];
++            fs_log("lua-fs: calling postponed handler '%s'\n", name);
++            g_binding->run_handler(name);
++        }
++        g_num_postponed_handlers = 0;
++
++        // setup lua shell if configured
++        fs_emu_lua_shell_init();
++    } else {
++        fs_log("lua-fs: ERROR binding to emu!\n");
++    }
+ }
+ 
+-void fs_emu_release_lua(void) {
+-    fs_mutex_unlock(g_mutex);
++void fs_emu_lua_unbind(void)
++{
++    if(g_is_bound) {
++        // shutdown lua shell if configured
++        fs_emu_lua_shell_free();
++
++        g_is_bound = 0;
++        fs_log("lua-fs: unbound from emu\n");
++    } else {
++        fs_log("lua-fs: ERROR unbinding from emu!\n");
++    }
+ }
+ 
+-void fs_emu_lua_init(void) {
+-    fs_log("fs_emu_lua_init\n");
+-    fs_emu_lua_state = luaL_newstate();
+-    fs_log("new lua_State at %p\n", fs_emu_lua_state);
+-    luaL_openlibs(fs_emu_lua_state);
+-    lua_register(fs_emu_lua_state, "fs_emu_log", l_fs_emu_log);
+-    g_mutex = fs_mutex_create();
++void fs_emu_lua_register_func(const char *name, fs_emu_lua_func func)
++{
++    if(g_num_func < MAX_LUA_FUNCS) {
++        lua_func *f = &g_func_table[g_num_func++];
++        f->name = name;
++        f->func = func;
++        fs_log("lua-fs: registered function '%s'\n", name);
++    } else {
++        fs_log("lua-fs: ERROR registering function '%s'\n", name);
++    }
++}
++
++int luaopen_fsemulib(lua_State *L)
++{
++    fs_log("lua-fs: setup state %p with %d 'fsemu' functions\n", L, g_num_func);
++
++    // create "fsemu" table
++    lua_newtable(L);
++    for(int i=0;i<g_num_func;i++) {
++        lua_func *f = &g_func_table[i];
++        lua_pushstring(L, f->name);
++        lua_pushcfunction(L, f->func);
++        lua_settable(L, -3);
++    }
++    return 1;
++}
++
++lua_State *fs_emu_lua_create_state(void)
++{
++    if(g_is_bound) {
++        return g_binding->create_state();
++    } else {
++        fs_log("lua-fs: not bound: can't create state\n");
++        return NULL;
++    }
++}
++
++void fs_emu_lua_destroy_state(lua_State *state)
++{
++    if(g_is_bound) {
++        g_binding->destroy_state(state);
++    } else {
++        fs_log("lua-fs: not bound: can't destroy state\n");
++    }
++}
++
++void fs_emu_lua_lock_state(lua_State *state)
++{
++    if(g_is_bound) {
++        g_binding->lock_state(state);
++    } else {
++        fs_log("lua-fs: not bound: can't lock state\n");
++    }
++}
++
++void fs_emu_lua_unlock_state(lua_State *state)
++{
++    if(g_is_bound) {
++        g_binding->unlock_state(state);
++    } else {
++        fs_log("lua-fs: not bound: can't unlock state\n");
++    }
++}
++
++int fs_emu_lua_run_handler(const char *name) {
++    if(g_is_bound) {
++        return g_binding->run_handler(name);
++    } else {
++        // try to postpone handler
++        for(int i=0;i<g_num_postponed_handlers;i++) {
++            // already postponed?
++            if(strcmp(g_postponed_handlers[i], name)==0) {
++                return 0;
++            }
++        }
++        // no more slots free?
++        if(g_num_postponed_handlers == MAX_POSTPONED_HANDLERS) {
++            fs_log("lua-fs: ignoring handler '%s'. no slots free!\n", name);
++            return -1;
++        }
++        // store in slot
++        g_postponed_handlers[g_num_postponed_handlers++] = name;
++        fs_log("lua-fs: not bound: postpone handler '%s'\n", name);
++        return 0;
++    }
++}
++
++int fs_emu_lua_run_script(const char *path)
++{
++    if(g_is_bound) {
++        return g_binding->run_script(path);
++    } else {
++        fs_log("lua-fs: not bound: ignoring script '%s'\n", path);
++        return 0;
++    }
+ }
+ 
+ #else
+ 
+-void fs_emu_lua_run_handler(const char *name) {
++int fs_emu_lua_run_handler(const char *name) {
++    // do nothing
++    return 0;
++}
++
++int fs_emu_lua_run_script(const char *path) {
+     // do nothing
++    return 0;
+ }
+ 
+ #endif
+diff --git a/libfsemu/src/emu/emu_lua.h b/libfsemu/src/emu/emu_lua.h
+deleted file mode 100644
+index bcac0c4f8..000000000
+--- a/libfsemu/src/emu/emu_lua.h
++++ /dev/null
+@@ -1,15 +0,0 @@
+-#ifndef LIBFSEMU_EMU_LUA_H_
+-#define LIBFSEMU_EMU_LUA_H_
+-
+-#ifdef WITH_LUA
+-
+-#include <lauxlib.h>
+-
+-void fs_emu_lua_init(void);
+-void fs_emu_lua_log_error(const char *msg);
+-
+-extern lua_State *fs_emu_lua_state;
+-
+-#endif
+-
+-#endif // LIBFSEMU_EMU_LUA_H_
+diff --git a/libfsemu/src/emu/lua_shell.c b/libfsemu/src/emu/lua_shell.c
+new file mode 100644
+index 000000000..5a6092782
+--- /dev/null
++++ b/libfsemu/src/emu/lua_shell.c
+@@ -0,0 +1,471 @@
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#ifdef WITH_LUA
++
++#include "lua_shell.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++#include <lualib.h>
++#ifdef __cplusplus
++}
++#endif
++
++#include <string.h>
++#include <errno.h>
++#include <stdio.h>
++#include <stdarg.h>
++#include <stdlib.h>
++
++#include <fs/net.h>
++#include <fs/log.h>
++#include <fs/thread.h>
++#include <fs/conf.h>
++#include <fs/emu_lua.h>
++
++static const char *hello_msg = "FS-UAE " PACKAGE_VERSION " " LUA_VERSION "\r\n";
++static const char *bye_msg = "bye.\r\n";
++static const char *fail_msg = "FAILED!\r\n";
++static const char *default_addr = "127.0.0.1";
++static const char *default_port = "6800";
++static fs_thread *g_listen_thread = NULL;
++static int g_listen_fd = -1;
++static int g_keep_listening;
++static int g_client_fd = -1;
++
++#define MAX_CMD_LEN     256
++
++#ifdef WINDOWS
++static int close(int socket) {
++    return closesocket(socket);
++}
++#define SHUTDOWN_ARG    SD_BOTH
++#else
++#define SHUTDOWN_ARG    SHUT_RDWR
++#endif
++
++#ifdef MSG_NOSIGNAL
++#define SEND_FLAG       MSG_NOSIGNAL
++#else
++#define SEND_FLAG       0
++#endif
++
++static int myprintf(int fd, const char *fmt, ...)
++{
++    va_list ap;
++    char buf[128];
++
++    va_start(ap, fmt);
++    int n = vsnprintf(buf, 128, fmt, ap);
++    va_end(ap);
++    if(n>0) {
++        return send(fd, buf, n, SEND_FLAG);
++    } else {
++        return 0;
++    }
++}
++
++static void print_lua_error(int fd, lua_State *L)
++{
++    // pop error and print
++    const char *err_msg = lua_tostring(L, -1);
++    myprintf(fd, "ERROR: %s\r\n", err_msg);
++    lua_pop(L,1);
++}
++
++// print replacement that writes to socket
++static int l_my_print(lua_State* L)
++{
++    // retrieve fd via closure
++    int fd = lua_tointeger(L, lua_upvalueindex(1));
++
++    int n = lua_gettop(L);
++    lua_getglobal(L, "tostring");
++    for(int i=1; i<=n; i++) {
++      lua_pushvalue(L, -1);  /* function to be called */
++      lua_pushvalue(L, i);   /* value to print */
++      lua_call(L, 1, 1);
++      size_t l;
++      const char *s = lua_tolstring(L, -1, &l);  /* get result */
++      if (s == NULL) {
++        return luaL_error(L,
++           LUA_QL("tostring") " must return a string to " LUA_QL("print"));
++      }
++      if (i>1) {
++          send(fd, "\t", 1, SEND_FLAG);
++      }
++      send(fd, s, l, SEND_FLAG);
++      lua_pop(L, 1);  /* pop result */
++    }
++    send(fd, "\r\n", 2, SEND_FLAG);
++    return 0;
++}
++
++static int l_my_quit(lua_State *L)
++{
++    int *quit_flag = (int *)lua_touserdata(L, lua_upvalueindex(1));
++    *quit_flag = 1;
++    return 0;
++}
++
++static void setup_shell_state(int fd, lua_State *L, int *quit_flag)
++{
++    // replace print function
++    lua_pushinteger(L, fd);
++    lua_pushcclosure(L, &l_my_print, 1);
++    lua_setglobal(L, "print");
++
++    // add a quit function
++    lua_pushlightuserdata(L, quit_flag);
++    lua_pushcclosure(L, &l_my_quit, 1);
++    lua_setglobal(L, "quit");
++}
++
++static int handle_command(int fd, lua_State *L, const char *cmd_line)
++{
++    // parse and execute command
++    if(luaL_loadbuffer(L, cmd_line, strlen(cmd_line), "=shell")
++        || lua_pcall(L, 0, LUA_MULTRET, 0)) {
++        print_lua_error(fd, L);
++        return 0;
++    }
++
++    // is there a result? -> call print!
++    if (lua_gettop(L) > 0) {
++      luaL_checkstack(L, LUA_MINSTACK, "too many results to print");
++      lua_getglobal(L, "print");
++      lua_insert(L, 1);
++      if (lua_pcall(L, lua_gettop(L)-1, 0, 0) != LUA_OK) {
++          print_lua_error(fd, L);
++      }
++    }
++    return 0;
++}
++
++static char* fixup_line(char *buf, int size)
++{
++    // overwrite last newline
++    if(size>0) {
++        size--;
++    }
++    buf[size] = '\0';
++
++    // strip return if before newline
++    if(size>0) {
++        if(buf[size-1] == '\r') {
++            buf[size-1] = '\0';
++        }
++    }
++
++    // prepend 'return' ?
++    if(buf[0]=='=') {
++        buf -= 6;
++        strcpy(buf,"return");
++        buf[6] = ' ';
++    }
++
++    printf("lua: got line: '%s'\n", buf);
++
++    return buf;
++}
++
++static char* read_line(int fd, const char *prompt, char *cmd_line, int len,
++                       int *read_pos, int *bytes_left, int *error_flag)
++{
++    int result;
++
++    // send prompt
++    result = send(fd, prompt, strlen(prompt), SEND_FLAG);
++    if(result < 0) {
++        return NULL;
++    }
++
++    // leave room for prepending "return" in buffer
++    char *buf = cmd_line + 6;
++    len -= 7;
++
++    // do we have still bytes left?
++    int left = *bytes_left;
++    int pos = *read_pos;
++    int offset = 0;
++    if(left > 0) {
++        for(int i=0;i<left;i++) {
++            // found a newline in buffer
++            if(buf[pos+i] == '\n') {
++                *bytes_left = left - 1 - i;
++                *read_pos = pos + i + 1;
++                return fixup_line(buf + pos, i+1);
++            }
++        }
++        // no newline found in buffer
++        // move left bytes to front of buffer
++        if(pos > 0) {
++            memcpy(buf, buf+pos, left);
++        }
++        len -= left;
++        offset = left;
++    }
++
++    // read new data from socket
++    char *ptr = buf + offset;
++    while(len > 0) {
++        result = recv(fd, ptr, len, 0);
++        // error reading from socket
++        if(result < 0) {
++            if(errno != EAGAIN) {
++                *error_flag = 1;
++                return NULL;
++            } else {
++                continue;
++            }
++        }
++        // socket was closed
++        else if(result == 0) {
++            *error_flag = 0;
++            return NULL;
++        }
++
++        // contains read data a newline?
++        for(int i=0;i<result;i++) {
++            if(*(ptr+i) == '\n') {
++                // extra data after newline?
++                *read_pos = offset + i + 1;
++                *bytes_left = result - 1 - i;
++                return fixup_line(buf, offset+i+1);
++            }
++        }
++        offset += result;
++        len -= result;
++        ptr += result;
++    }
++    return NULL;
++}
++
++static void main_loop(int fd, lua_State *L, int *quit_flag)
++{
++    char *cmd_line = (char *)malloc(MAX_CMD_LEN);
++    if(cmd_line == NULL) {
++        myprintf(fd, "ERROR: out of memory\r\n");
++        return;
++    }
++
++    int result = 0;
++    int read_pos = 0;
++    int error_flag = 0;
++    int bytes_left = 0;
++    while(!*quit_flag) {
++        // read a command
++        char *line = read_line(fd, "> ", cmd_line, MAX_CMD_LEN,
++                               &read_pos, &bytes_left, &error_flag);
++        if(line == NULL) {
++            if(error_flag) {
++                myprintf(fd, "ERROR: error reading line\r\n");
++            }
++            break;
++        }
++        // exit shell? -> CTRL+D
++        if(line[0] == '\x04') {
++            myprintf(fd, "aborted.\r\n");
++            break;
++        }
++
++        // execute command
++        fs_emu_lua_lock_state(L);
++        result = handle_command(fd, L, line);
++        fs_emu_lua_unlock_state(L);
++        if(result < 0) {
++            myprintf(fd, "ERROR: command handling failed\r\n");
++            break;
++        }
++    }
++
++    // free command line
++    free(cmd_line);
++
++    // show final result
++    if(result < 0) {
++        myprintf(fd, fail_msg);
++    } else {
++        myprintf(fd, bye_msg);
++    }
++
++    fs_log("lua_shell: main loop done\n");
++}
++
++static void handle_client(int fd)
++{
++    fs_log("lua-shell: client connect\n");
++
++    // welcome
++    send(fd, hello_msg, strlen(hello_msg), SEND_FLAG);
++
++    // create lua context
++    lua_State *L = fs_emu_lua_create_state();
++    if(L == NULL) {
++        // error
++    }
++    else {
++        // flag to tell shell end
++        int quit_flag = 0;
++
++        // setup state for shell
++        setup_shell_state(fd, L, &quit_flag);
++
++        // enter main loop
++        main_loop(fd, L, &quit_flag);
++
++        // free context
++        fs_emu_lua_destroy_state(L);
++    }
++
++    // close connection
++    close(fd);
++    fs_log("lua-shell: client disconnect\n");
++}
++
++static void *lua_shell_listener(void *data)
++{
++    struct sockaddr_in client_addr;
++
++    fs_log("lua-shell: +listener: %d\n", g_listen_fd);
++    while(g_keep_listening) {
++        // get next client
++        socklen_t cli_size = sizeof(client_addr);
++        int client_fd = accept(g_listen_fd, (struct sockaddr *)&client_addr, &cli_size);
++        if(client_fd < 0) {
++            fs_log("lua-shell: failed accept: %s\n", strerror(errno));
++            break;
++        }
++        g_client_fd = client_fd;
++        handle_client(client_fd);
++        g_client_fd = -1;
++    }
++    fs_log("lua-shell: -listener\n");
++    return NULL;
++}
++
++void fs_emu_lua_shell_init(void)
++{
++    // is shell enabled?
++    if(!fs_config_get_boolean("lua_shell")) {
++        fs_log("lua-shell: disabled\n");
++        return;
++    }
++
++    // get config values
++    const char *addr = fs_config_get_string("lua_shell_addr");
++    if(addr == NULL) {
++        addr = default_addr;
++    }
++    const char *port = fs_config_get_string("lua_shell_port");
++    if(port == NULL) {
++        port = default_port;
++    }
++    fs_log("lua-shell: addr=%s, port=%s\n", addr, port);
++
++#ifdef WINDOWS
++    WORD wVersionRequested;
++    WSADATA wsaData;
++    wVersionRequested = MAKEWORD(2, 2);
++    int wsa_err = WSAStartup(wVersionRequested, &wsaData);
++    if (wsa_err != 0) {
++        fs_emu_warning("ERROR: WSAStartup failed with error: %d\n", wsa_err);
++        return;
++    }
++#endif
++
++    // find address
++    struct addrinfo hints;
++    struct addrinfo *result;
++    memset(&hints, 0, sizeof(struct addrinfo));
++    hints.ai_family = AF_UNSPEC;    // Allow IPv4 or IPv6
++    hints.ai_socktype = SOCK_STREAM;
++    hints.ai_flags = 0;
++    hints.ai_protocol = 0;
++    int s = getaddrinfo(addr, port, &hints, &result);
++    if (s != 0) {
++        fs_log("lua-shell: getaddrinfo failed: %s\n", gai_strerror(s));
++        return;
++    }
++    if(s > 1) {
++        fs_log("lua-shell: found multiple address matches... taking first\n");
++    }
++
++    // try to open socket
++    g_listen_fd = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
++    if(g_listen_fd < 0) {
++        freeaddrinfo(result);
++        fs_log("lua-shell: can't create socket: %s\n", strerror(errno));
++        return;
++    }
++
++    // allow to rebind soon
++    int yes = 1;
++    if (setsockopt(g_listen_fd, SOL_SOCKET, SO_REUSEADDR, (const char*)&yes, sizeof(int)) == -1)
++    {
++        freeaddrinfo(result);
++        close(g_listen_fd);
++        fs_log("lua-shell: can't set socket option: %s\n", strerror(errno));
++        return;
++    }
++
++    // bind socket
++    if(bind(g_listen_fd, result->ai_addr, result->ai_addrlen) < 0) {
++        freeaddrinfo(result);
++        close(g_listen_fd);
++        fs_log("lua-shell: can't bind socket: %s\n", strerror(errno));
++        return;
++    }
++
++    // cleanup addrinfo
++    freeaddrinfo(result);
++
++    // start listening
++    if(listen(g_listen_fd, 5) < 0) {
++        close(g_listen_fd);
++        fs_log("lua-shell: can't listen on socket: %s\n", strerror(errno));
++        return;
++    }
++
++    // launch listener thread
++    g_keep_listening = 1;
++    g_listen_thread = fs_thread_create("lua_shell_listener",
++                                       lua_shell_listener, NULL);
++}
++
++void fs_emu_lua_shell_free(void)
++{
++    fs_log("lua-shell: stopping... %d %d\n", g_client_fd, g_listen_fd) ;
++
++    // close client socket
++    if(g_client_fd >= 0) {
++#if (defined(__APPLE__) || defined(WINDOWS))
++        close(g_client_fd);
++#else
++        shutdown(g_client_fd, SHUTDOWN_ARG);
++#endif
++    }
++
++    // close listener socket
++    if(g_listen_fd >= 0) {
++#if (defined(__APPLE__) || defined(WINDOWS))
++        close(g_listen_fd);
++#else
++        shutdown(g_listen_fd, SHUTDOWN_ARG);
++#endif
++    }
++
++    // end listener thread
++    if(g_listen_thread != NULL) {
++        fs_thread_wait(g_listen_thread);
++        fs_thread_free(g_listen_thread);
++        g_listen_thread = NULL;
++    }
++
++    fs_log("lua-shell: stopping done...\n");
++}
++
++#endif // WITH_LUA
+diff --git a/libfsemu/src/emu/lua_shell.h b/libfsemu/src/emu/lua_shell.h
+new file mode 100644
+index 000000000..bc32ac9db
+--- /dev/null
++++ b/libfsemu/src/emu/lua_shell.h
+@@ -0,0 +1,11 @@
++#ifndef LIBFSEMU_LUA_SHELL_H_
++#define LIBFSEMU_LUA_SHELL_H_
++
++#ifdef WITH_LUA
++
++extern void fs_emu_lua_shell_init(void);
++extern void fs_emu_lua_shell_free(void);
++
++#endif
++
++#endif // LIBFSEMU_LUA_SHELL_H_
+diff --git a/libfsemu/src/emu/render.c b/libfsemu/src/emu/render.c
+index 5929e439a..b7fa7c95d 100644
+--- a/libfsemu/src/emu/render.c
++++ b/libfsemu/src/emu/render.c
+@@ -21,11 +21,11 @@
+ #include <fs/thread.h>
+ #include <fs/time.h>
+ #include <fs/util.h>
++#include <fs/emu_lua.h>
+ 
+ #include "libfsemu.h"
+ #include "audio.h"
+ #include "dialog.h"
+-#include "emu_lua.h"
+ #include "font.h"
+ #include "hud.h"
+ #include "menu.h"
+@@ -2444,9 +2444,8 @@ void fs_emu_render_init_lua(void) {
+ 
+     //lua_register(fs_emu_lua_state, "fs_emu_render_frame",
+     //        l_fs_emu_render_frame);
+-    lua_register(fs_emu_lua_state, "fs_emu_set_scale",
+-            l_fs_emu_set_scale);
+-    lua_register(fs_emu_lua_state, "fs_emu_set_frame_position_and_size",
++    fs_emu_lua_register_func("set_scale", l_fs_emu_set_scale);
++    fs_emu_lua_register_func("set_frame_position_and_size",
+             l_fs_emu_set_frame_position_and_size);
+ }
+ 
+diff --git a/libfsemu/src/emu/theme.c b/libfsemu/src/emu/theme.c
+index f1fb03abd..4e775c6ac 100644
+--- a/libfsemu/src/emu/theme.c
++++ b/libfsemu/src/emu/theme.c
+@@ -14,6 +14,7 @@
+ #include <stdio.h>
+ #include <stdlib.h>
+ #include <string.h>
++#include <fs/emu_lua.h>
+ 
+ #include "texture.h"
+ #include "libfsemu.h"
+@@ -22,19 +23,13 @@ struct fs_emu_theme g_fs_emu_theme = {};
+ 
+ #ifdef WITH_LUA
+ 
+-#include "emu_lua.h"
+-
+ void fs_emu_theme_init_lua(void)
+ {
+     fs_log("fs_emu_theme_init_lua\n");
+ 
+     char *path = g_build_filename(g_fs_emu_theme.path, "theme.lua", NULL);
+     if (fs_path_exists(path)) {
+-        int result = luaL_dofile(fs_emu_lua_state, path);
+-        if (result != 0) {
+-            fs_emu_warning("Error loading/running theme.lua");
+-            fs_emu_lua_log_error("Error loading/running theme.lua");
+-        }
++        fs_emu_lua_run_script(path);
+     }
+     free(path);
+ }
+diff --git a/libfsemu/src/emu/video.c b/libfsemu/src/emu/video.c
+index 74d6a2ad2..91928d6f5 100644
+--- a/libfsemu/src/emu/video.c
++++ b/libfsemu/src/emu/video.c
+@@ -9,13 +9,13 @@
+ #include <fs/ml.h>
+ #include <fs/thread.h>
+ #include <math.h>
++#include <fs/emu_lua.h>
+ 
+ #ifdef USE_OPENGL
+ #include <fs/ml/opengl.h>
+ #endif
+ 
+ #include "audio.h"
+-#include "emu_lua.h"
+ #include "font.h"
+ #include "libfsemu.h"
+ #include "menu.h"
+diff --git a/libfsemu/src/emu/xml_shader.c b/libfsemu/src/emu/xml_shader.c
+index da0df5a21..5094e1620 100644
+--- a/libfsemu/src/emu/xml_shader.c
++++ b/libfsemu/src/emu/xml_shader.c
+@@ -15,6 +15,7 @@
+ #include <fs/glib.h>
+ #include <fs/i18n.h>
+ #include <fs/log.h>
++#include <fs/emu_lua.h>
+ 
+ #include <stdio.h>
+ #include <stdlib.h>
+@@ -25,10 +26,6 @@
+ #ifdef USE_SDL2
+ #include <SDL.h>
+ #endif
+-#ifdef WITH_LUA
+-#include "emu_lua.h"
+-#endif
+-
+ #define debug_printf(format, ...)
+ //#define debug_printf printf
+ 
+@@ -1214,11 +1211,8 @@ void fs_emu_xml_shader_init(void)
+     fs_emu_load_default_shader();
+ 
+ #ifdef WITH_LUA
+-    lua_State *L = fs_emu_lua_state;
+-
+-    lua_register(L, "fs_emu_load_shader", l_fs_emu_load_shader);
+-    lua_register(L, "fs_emu_set_shader", l_fs_emu_set_shader);
+-
++    fs_emu_lua_register_func("load_shader", l_fs_emu_load_shader);
++    fs_emu_lua_register_func("set_shader", l_fs_emu_set_shader);
+ #endif
+ }
+ 
+diff --git a/src/fs-uae/fs-uae.h b/src/fs-uae/fs-uae.h
+index a0cb67d71..ae51f4863 100644
+--- a/src/fs-uae/fs-uae.h
++++ b/src/fs-uae/fs-uae.h
+@@ -103,7 +103,7 @@ extern int g_fs_uae_last_input_event_state;
+ void fs_uae_process_input_event(int line, int action, int state, int playback);
+ 
+ #ifdef WITH_LUA
+-void fs_uae_init_lua_state(lua_State *L);
++int luaopen_fsuaelib(lua_State *L);
+ #endif
+ 
+ void fs_uae_toggle_auto_zoom(void);
+diff --git a/src/fs-uae/lualibfsuae.c b/src/fs-uae/lualibfsuae.c
+new file mode 100644
+index 000000000..24998e9df
+--- /dev/null
++++ b/src/fs-uae/lualibfsuae.c
+@@ -0,0 +1,146 @@
++#ifdef HAVE_CONFIG_H
++#include "config.h"
++#endif
++
++#include "fs-uae.h"
++#include <fs/emu.h>
++#include <fs/log.h>
++#include <uae/uae.h>
++
++#ifdef WITH_LUA
++
++static int l_fs_uae_get_save_state_number(lua_State *L) {
++    lua_pushinteger(L, g_fs_uae_state_number);
++    return 1;
++}
++
++static int l_fs_uae_get_input_event(lua_State *L) {
++    lua_pushinteger(L, g_fs_uae_last_input_event);
++    lua_pushinteger(L, g_fs_uae_last_input_event_state);
++    return 2;
++}
++
++static int l_fs_uae_set_input_event(lua_State *L) {
++    int input_event = luaL_checkint(L, -2);
++    int state = luaL_checkint(L, -1);
++    g_fs_uae_last_input_event = input_event;
++    g_fs_uae_last_input_event_state = state;
++    return 0;
++}
++
++static int l_fs_uae_send_input_event(lua_State *L) {
++    int input_event = luaL_checkint(L, -2);
++    int state = luaL_checkint(L, -1);
++/*
++    fs_uae_process_input_event(input_event, state);
++*/
++    return 0;
++}
++
++static int l_fs_uae_get_state_checksum(lua_State *L) {
++    lua_pushinteger(L, amiga_get_state_checksum());
++    return 1;
++}
++
++static int l_fs_uae_get_rand_checksum(lua_State *L) {
++    lua_pushinteger(L, amiga_get_state_checksum());
++    return 1;
++}
++
++// floppy functions
++
++static int l_floppy_set_file(lua_State *L)
++{
++    int index = luaL_checkint(L, -2);
++    const char *name = luaL_checkstring(L, -1);
++    amiga_floppy_set_file(index, name);
++    return 0;
++}
++
++static int l_floppy_get_file(lua_State *L)
++{
++    int index = luaL_checkint(L, -1);
++    const char *name = amiga_floppy_get_file(index);
++    lua_pushstring(L, name);
++    return 1;
++}
++
++static int l_floppy_get_num_drives(lua_State *L)
++{
++    int n = amiga_get_num_floppy_drives();
++    lua_pushinteger(L, n);
++    return 1;
++}
++
++// cdrom functions
++
++static int l_cdrom_set_file(lua_State *L)
++{
++    int index = luaL_checkint(L, -2);
++    const char *name = luaL_checkstring(L, -1);
++    amiga_cdrom_set_file(index, name);
++    return 0;
++}
++
++static int l_cdrom_get_file(lua_State *L)
++{
++    int index = luaL_checkint(L, -1);
++    const char *name = amiga_cdrom_get_file(index);
++    lua_pushstring(L, name);
++    return 1;
++}
++
++static int l_cdrom_get_num_drives(lua_State *L)
++{
++    int n = amiga_get_num_cdrom_drives();
++    lua_pushinteger(L, n);
++    return 1;
++}
++
++static const struct luaL_Reg fsuaelib[] = {
++    {"get_input_event", l_fs_uae_get_input_event},
++    {"set_input_event", l_fs_uae_set_input_event},
++    {"send_input_event", l_fs_uae_send_input_event},
++    {"get_save_state_number", l_fs_uae_get_save_state_number},
++    {"get_state_checksum", l_fs_uae_get_state_checksum},
++    {"get_rand_checksum", l_fs_uae_get_rand_checksum},
++    {NULL, NULL}
++};
++
++static const struct luaL_Reg floppylib[] = {
++    {"set_file", l_floppy_set_file},
++    {"get_file", l_floppy_get_file},
++    {"get_num_drives", l_floppy_get_num_drives},
++    {NULL, NULL}
++};
++
++static const struct luaL_Reg cdromlib[] = {
++    {"set_file", l_cdrom_set_file},
++    {"get_file", l_cdrom_get_file},
++    {"get_num_drives", l_cdrom_get_num_drives},
++    {NULL, NULL}
++};
++
++int luaopen_fsuaelib(lua_State *L)
++{
++    fs_log("lua: open fsuaelib for state %p\n", L);
++    lua_newtable(L);
++    luaL_setfuncs(L, fsuaelib, 0);
++
++    // floppy table
++    lua_pushstring(L, "floppy");
++    lua_newtable(L);
++    luaL_setfuncs(L, floppylib, 0);
++    lua_settable(L, -3);
++
++    // cdrom table
++    lua_pushstring(L, "cdrom");
++    lua_newtable(L);
++    luaL_setfuncs(L, cdromlib, 0);
++    lua_settable(L, -3);
++
++    // top is now uaelib table
++    return 1;
++}
++
++#endif
+diff --git a/src/fs-uae/luascript.c b/src/fs-uae/luascript.c
+deleted file mode 100644
+index d343aec8b..000000000
+--- a/src/fs-uae/luascript.c
++++ /dev/null
+@@ -1,61 +0,0 @@
+-#ifdef HAVE_CONFIG_H
+-#include "config.h"
+-#endif
+-
+-#include "fs-uae.h"
+-#include <fs/emu.h>
+-#include <fs/log.h>
+-#include <uae/uae.h>
+-
+-#ifdef WITH_LUA
+-
+-static int l_fs_uae_get_save_state_number(lua_State *L) {
+-    lua_pushinteger(L, g_fs_uae_state_number);
+-    return 1;
+-}
+-
+-static int l_fs_uae_get_input_event(lua_State *L) {
+-    lua_pushinteger(L, g_fs_uae_last_input_event);
+-    lua_pushinteger(L, g_fs_uae_last_input_event_state);
+-    return 2;
+-}
+-
+-static int l_fs_uae_set_input_event(lua_State *L) {
+-    int input_event = luaL_checkint(L, -2);
+-    int state = luaL_checkint(L, -1);
+-    g_fs_uae_last_input_event = input_event;
+-    g_fs_uae_last_input_event_state = state;
+-    return 0;
+-}
+-
+-static int l_fs_uae_send_input_event(lua_State *L) {
+-    int input_event = luaL_checkint(L, -2);
+-    int state = luaL_checkint(L, -1);
+-/*
+-    fs_uae_process_input_event(input_event, state);
+-*/
+-    return 0;
+-}
+-
+-static int l_fs_uae_get_state_checksum(lua_State *L) {
+-    lua_pushinteger(L, amiga_get_state_checksum());
+-    return 1;
+-}
+-
+-static int l_fs_uae_get_rand_checksum(lua_State *L) {
+-    lua_pushinteger(L, amiga_get_state_checksum());
+-    return 1;
+-}
+-
+-void fs_uae_init_lua_state(lua_State *L) {
+-    fs_log("fs_uae_lua_init_state %p\n", L);
+-    lua_register(L, "fs_uae_get_input_event", l_fs_uae_get_input_event);
+-    lua_register(L, "fs_uae_set_input_event", l_fs_uae_set_input_event);
+-    lua_register(L, "fs_uae_send_input_event", l_fs_uae_send_input_event);
+-    lua_register(L, "fs_uae_get_save_state_number",
+-            l_fs_uae_get_save_state_number);
+-    lua_register(L, "fs_uae_get_state_checksum", l_fs_uae_get_state_checksum);
+-    lua_register(L, "fs_uae_get_rand_checksum", l_fs_uae_get_rand_checksum);
+-}
+-
+-#endif
+diff --git a/src/fs-uae/main.c b/src/fs-uae/main.c
+index c950490d6..97ccdf897 100644
+--- a/src/fs-uae/main.c
++++ b/src/fs-uae/main.c
+@@ -42,8 +42,29 @@ static int g_warn_about_missing_config_file;
+ #define LOG_LINE "---------------------------------------------------------" \
+         "-------------------\n"
+ 
+-static void change_port_device_mode(int data)
++#ifdef WITH_LUA
++static fs_emu_lua_binding g_uae_lua_binding = {
++    .run_handler = amiga_lua_run_handler,
++    .run_script = amiga_lua_run_script,
++    .create_state = amiga_lua_create_state,
++    .destroy_state = amiga_lua_destroy_state,
++    .lock_state = amiga_lua_lock_state,
++    .unlock_state = amiga_lua_unlock_state
++};
++
++static void lua_setup_state(lua_State *L)
+ {
++    // open "fsemu" lib
++    luaopen_fsemulib(L); // get lib table
++    lua_setglobal(L, "fsemu"); // assign global name "fsemu"
++
++    // open "fsuae" lib
++    luaopen_fsuaelib(L); // get lib table
++    lua_setglobal(L, "fsuae"); // assign global name "fsuae"
++}
++#endif
++
++static void change_port_device_mode(int data) {
+     int modes = INPUTEVENT_AMIGA_JOYPORT_MODE_0_LAST -
+             INPUTEVENT_AMIGA_JOYPORT_MODE_0_NONE + 1;
+     int port = data / modes;
+@@ -1252,9 +1273,9 @@ int main(int argc, char *argv[])
+     }
+ 
+ #ifdef WITH_LUA
+-    amiga_init_lua(fs_emu_acquire_lua, fs_emu_release_lua);
+-    amiga_init_lua_state(fs_emu_get_lua_state());
+-    fs_uae_init_lua_state(fs_emu_get_lua_state());
++    fs_emu_lua_set_binding(&g_uae_lua_binding);
++    amiga_lua_init(fs_emu_lua_bind, fs_emu_lua_unbind);
++    amiga_lua_set_extra_state_init(lua_setup_state);
+ #endif
+ 
+     if (fs_emu_get_video_format() == FS_EMU_VIDEO_FORMAT_RGBA) {
+diff --git a/src/include/lualibuae.h b/src/include/lualibuae.h
+new file mode 100644
+index 000000000..1059ae9ce
+--- /dev/null
++++ b/src/include/lualibuae.h
+@@ -0,0 +1,26 @@
++/*
++* UAE - The Un*x Amiga Emulator
++*
++* LUA Scripting Layer: uae library
++*
++* Copyright 2013 Frode SOlheim
++*/
++
++#ifndef UAE_LUALIBUAE_H
++#define UAE_LUALIBUAE_H
++
++#ifdef WITH_LUA
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++#include <lauxlib.h>
++#ifdef __cplusplus
++}
++#endif
++
++int luaopen_uaelib(lua_State *L);
++
++#endif // WITH_LUA
++
++#endif // UAE_LUALIBUAE_H
+diff --git a/src/include/luascript.h b/src/include/luascript.h
+index bac5d1c5a..972992f7b 100644
+--- a/src/include/luascript.h
++++ b/src/include/luascript.h
+@@ -11,27 +11,34 @@
+ 
+ #ifdef WITH_LUA
+ 
+-#ifdef FSUAE // NL
++#ifdef __cplusplus
+ extern "C" {
+-#endif // NL
+-
++#endif
+ #include <lauxlib.h>
+-
+-#ifdef FSUAE // NL
++#ifdef __cplusplus
+ }
+ #endif
+ 
+-#ifdef FSUAE
+-//void uae_lua_init(void (*lock)(void), void (*unlock)(void));
+-#endif
++#define UAE_LUA_STATE_AUTO_CLEAN        1
++#define UAE_LUA_STATE_NO_HANDLER        2
++
++typedef void (*uae_lua_state_cb)(lua_State *);
++typedef void (*uae_lua_cb)(void);
++
++void uae_lua_set_extra_state_setup(uae_lua_state_cb func);
++void uae_lua_set_callbacks(uae_lua_cb init_cb, uae_lua_cb exit_cb);
++
+ void uae_lua_init(void);
+-void uae_lua_load(const TCHAR *filename);
+-void uae_lua_loadall(void);
+ void uae_lua_free(void);
+-void uae_lua_init_state(lua_State *L);
+-void uae_lua_run_handler(const char *name);
+-void uae_lua_aquire_lock();
+-void uae_lua_release_lock();
++
++int uae_lua_run_script(const TCHAR *filename);
++int uae_lua_run_handler(const char *name);
++void uae_lua_run_init_scripts(void);
++
++lua_State *uae_lua_create_state(int flags);
++void uae_lua_destroy_state(lua_State *state);
++void uae_lua_lock_state(lua_State *state);
++void uae_lua_unlock_state(lua_State *state);
+ 
+ #endif /* WITH_LUA */
+ 
+diff --git a/src/lualibuae.cpp b/src/lualibuae.cpp
+new file mode 100644
+index 000000000..e3c19c654
+--- /dev/null
++++ b/src/lualibuae.cpp
+@@ -0,0 +1,154 @@
++/*
++* UAE - The Un*x Amiga Emulator
++*
++* LUA Scripting Layer: uae library
++*
++* Copyright 2013 Frode SOlheim
++*/
++
++#include "sysconfig.h"
++#include "sysdeps.h"
++
++#ifdef __cplusplus
++extern "C" {
++#endif
++#include <lualib.h>
++#ifdef __cplusplus
++}
++#endif
++
++#include "lualibuae.h"
++#include "options.h"
++#include "identify.h"
++#include "debug.h"
++#include "uaeexe.h"
++
++#ifdef WITH_LUA
++
++static int l_uae_read_u8(lua_State *L)
++{
++    int addr = luaL_checkint(L, 1);
++    int value = debug_read_memory_8(addr);
++    lua_pushinteger(L, value);
++    return value >= 0 ? 1 : 0;
++}
++
++static int l_uae_write_u8(lua_State *L)
++{
++    int addr = luaL_checkint(L, 1);
++    uint8_t value = luaL_checkint(L, 2);
++    debug_write_memory_8(addr, value);
++    return 0;
++}
++static int l_uae_write_u16(lua_State *L)
++{
++    int addr = luaL_checkint(L, 1);
++    uint16_t value = luaL_checkint(L, 2);
++    debug_write_memory_16(addr, value);
++    return 0;
++}
++
++static int l_uae_read_u16(lua_State *L)
++{
++    int addr = luaL_checkint(L, 1);
++    int value = debug_read_memory_16(addr);
++    lua_pushinteger(L, value);
++	return value >= 0 ? 1 : 0;
++}
++
++/* peek = read without any side-effects */
++static int l_uae_peek_u16(lua_State *L)
++{
++    int result = 0;
++	uint16_t value;
++    int addr = luaL_checkint(L, 1);
++
++	value = debug_peek_memory_16 (addr);
++	if (value >= 0) {
++        lua_pushinteger(L, value);
++        result = 1;
++    }
++    return result;
++}
++
++static int l_uae_read_config(lua_State *L)
++{
++	int result = 0;
++    const char *s = luaL_checkstring(L, 1);
++	TCHAR *ts = au(s);
++	TCHAR out[MAX_DPATH];
++	if (cfgfile_searchconfig(ts, -1, out, sizeof out / sizeof(TCHAR)) == -1) {
++		char *c = ua(out);
++		lua_pushstring(L, c);
++		xfree(c);
++		result = 1;
++	}
++	xfree(ts);
++	return result;
++}
++
++static int l_uae_write_config(lua_State *L)
++{
++    const char *s = luaL_checkstring(L, 1);
++	TCHAR *ts = au(s);
++	TCHAR out[MAX_DPATH];
++	cfgfile_modify(-1, ts, _tcslen(ts), out, sizeof out / sizeof(TCHAR));
++	char *c = ua(out);
++	lua_pushstring(L, c);
++	xfree(c);
++	return 1;
++}
++
++static int l_uae_log(lua_State *L)
++{
++    const char *s = luaL_checkstring(L, 1);
++    write_log("%s", s);
++    //printf("%s", s);
++    return 0;
++}
++
++static int l_uae_exe(lua_State *L)
++{
++    const char *s = luaL_checkstring(L, 1);
++    int result = uaeexe(s);
++    lua_pushinteger(L, result);
++    return 1;
++}
++
++static const struct luaL_Reg uaelib[] = {
++    {"log", l_uae_log},
++    {"read_u8", l_uae_read_u8},
++    {"read_u16", l_uae_read_u16},
++    {"peek_u16", l_uae_peek_u16},
++    {"write_u8", l_uae_write_u8},
++    {"write_u16", l_uae_write_u16},
++    {"read_config", l_uae_read_config},
++    {"write_config", l_uae_write_config},
++    {"exe", l_uae_exe},
++    {NULL, NULL}
++};
++
++int luaopen_uaelib(lua_State *L)
++{
++    lua_newtable(L);
++    luaL_setfuncs(L, uaelib, 0);
++    // top is now uaelib table
++
++    // create a new table "custom"
++    lua_pushstring(L, "custom");
++    lua_newtable(L);
++    // add names of custom chip registers
++    for (int i = 0; custd[i].name; i++) {
++        char *s = ua(custd[i].name);
++        lua_pushstring(L, s); // key
++        lua_pushinteger(L, custd[i].adr); // value
++        lua_settable(L, -3);
++        xfree(s);
++    }
++    // set uae.custom = {}
++    lua_settable(L, -3);
++
++    return 1; // top is uaelib table
++}
++
++#endif
+diff --git a/src/luascript.cpp b/src/luascript.cpp
+index 816da40ce..7f12281b1 100644
+--- a/src/luascript.cpp
++++ b/src/luascript.cpp
+@@ -9,220 +9,257 @@
+ #include "sysconfig.h"
+ #include "sysdeps.h"
+ 
++#ifdef __cplusplus
++extern "C" {
++#endif
+ #include <lualib.h>
++#ifdef __cplusplus
++}
++#endif
+ 
+ #include "options.h"
+-#include "savestate.h"
+-#include "memory.h"
+-#include "debug.h"
+-#include "identify.h"
+-#include "luascript.h"
+-#include "uae.h"
+ #include "zfile.h"
+-#include "threaddep/thread.h"
++#include "uae.h"
++#include "luascript.h"
++#include "lualibuae.h"
+ 
+ #ifdef WITH_LUA
+ 
+-static int g_num_states;
+-static lua_State *g_states[MAX_LUA_STATES];
++typedef struct uae_lua_state {
++    lua_State *state;
++    int flags;
++    struct uae_lua_state *next;
++} uae_lua_state_t;
+ 
++static uae_lua_state_t g_states[MAX_LUA_STATES];
++static uae_lua_state_t *g_free;
++static uae_lua_state_t *g_first;
++static int g_num_states;
+ static uae_sem_t lua_sem;
++static uae_lua_state_cb g_extra_state_setup;
++static uae_lua_cb g_init_cb;
++static uae_lua_cb g_exit_cb;
+ 
+-static int l_uae_read_u8(lua_State *L)
++static void setup_state(lua_State *L)
+ {
+-    int addr = luaL_checkint(L, 1);
+-    int value = debug_read_memory_8(addr);
+-    lua_pushinteger(L, value);
+-    return value >= 0 ? 1 : 0;
++    luaopen_uaelib(L); // get lib table
++    lua_setglobal(L, "uae"); // assign "uae"
+ }
+ 
+-static int l_uae_write_u8(lua_State *L)
++void uae_lua_log_error(lua_State *L, const char *msg)
+ {
+-    int addr = luaL_checkint(L, 1);
+-    uint8_t value = luaL_checkint(L, 2);
+-    debug_write_memory_8(addr, value);
+-    return 0;
++    write_log("lua:ERROR: %s: %s\n", msg, lua_tostring(L, -1));
++    //printf("%s: %s\n", msg, lua_tostring(L, -1));
+ }
+-static int l_uae_write_u16(lua_State *L)
++
++int uae_lua_run_handler(const char *name)
+ {
+-    int addr = luaL_checkint(L, 1);
+-    uint16_t value = luaL_checkint(L, 2);
+-    debug_write_memory_16(addr, value);
++    uae_lua_state *state = g_first;
++    while(state != NULL) {
++        if((state->flags & UAE_LUA_STATE_NO_HANDLER)==0) {
++            lua_State *L = state->state;
++            uae_lua_lock_state(L);
++            lua_getglobal(L, name);
++            if (lua_isnil(L, -1)) {
++                //lua_pop(L, 1);
++            }
++            else if (lua_pcall(L, 0, 0, 0) != 0) {
++                uae_lua_log_error(L, name);
++                //lua_pop(L, 1);
++            }
++            lua_settop(L, 0);
++            uae_lua_unlock_state(L);
++        }
++        state = state->next;
++    }
+     return 0;
+ }
+ 
+-static int l_uae_read_u16(lua_State *L)
++int uae_lua_run_script(const TCHAR *filename)
+ {
+-    int addr = luaL_checkint(L, 1);
+-    int value = debug_read_memory_16(addr);
+-    lua_pushinteger(L, value);
+-	return value >= 0 ? 1 : 0;
+-}
++    lua_State *L = uae_lua_create_state(UAE_LUA_STATE_AUTO_CLEAN);
++    if(L == NULL) {
++        write_log (_T("lua:%s: can't create state\n"), filename);
++        return -1;
++    }
+ 
+-/* peek = read without any side-effects */
+-static int l_uae_peek_u16(lua_State *L)
+-{
+-    int result = 0;
+-	uint16_t value;
+-    int addr = luaL_checkint(L, 1);
+-
+-	value = debug_peek_memory_16 (addr);
+-	if (value >= 0) {
+-        lua_pushinteger(L, value);
+-        result = 1;
++    char *fn = ua (filename);
++    int err = luaL_loadfilex(L, fn, NULL);
++    if (!err) {
++        err = lua_pcall(L, 0, LUA_MULTRET, 0);
++        if (!err) {
++            write_log (_T("lua:%s: loaded\n"), filename);
++        }
+     }
+-    return result;
++    if (err) {
++        write_log (_T("lua:%s: initialization failed: %d\n"), filename, err);
++        uae_lua_destroy_state(L);
++    }
++    xfree (fn);
++    return err;
+ }
+ 
+-static int l_uae_read_config(lua_State *L)
++void uae_lua_run_init_scripts(void)
+ {
+-	int result = 0;
+-    const char *s = luaL_checkstring(L, 1);
+-	TCHAR *ts = au(s);
+-	TCHAR out[MAX_DPATH];
+-	if (cfgfile_searchconfig(ts, -1, out, sizeof out / sizeof(TCHAR)) == -1) {
+-		char *c = ua(out);
+-		lua_pushstring(L, c);
+-		xfree(c);
+-		result = 1;
+-	}
+-	xfree(ts);
+-	return result;
++    TCHAR tmp[MAX_DPATH];
++    fetch_luapath (tmp, sizeof tmp / sizeof (TCHAR));
++    _tcscat (tmp, _T("default.lua"));
++    if (zfile_exists (tmp))
++        uae_lua_run_script(tmp);
++    for (int i = 0; i < MAX_LUA_STATES; i++) {
++        if (currprefs.luafiles[i][0]) {
++            uae_lua_run_script(currprefs.luafiles[i]);
++        }
++    }
+ }
+ 
+-static int l_uae_write_config(lua_State *L)
++void uae_lua_lock_state(lua_State *L)
+ {
+-    const char *s = luaL_checkstring(L, 1);
+-	TCHAR *ts = au(s);
+-	TCHAR out[MAX_DPATH];
+-	cfgfile_modify(-1, ts, _tcslen(ts), out, sizeof out / sizeof(TCHAR));
+-	char *c = ua(out);
+-	lua_pushstring(L, c);
+-	xfree(c);
+-	return 1;
++    uae_sem_wait (&lua_sem);
+ }
+ 
+-static int l_uae_log(lua_State *L)
++void uae_lua_unlock_state(lua_State *L)
+ {
+-    const char *s = luaL_checkstring(L, 1);
+-    write_log("%s", s);
+-    //printf("%s", s);
+-    return 0;
++    uae_sem_post (&lua_sem);
+ }
+ 
+-void uae_lua_log_error(lua_State *L, const char *msg)
++lua_State *uae_lua_create_state(int flags)
+ {
+-    write_log("%s: %s\n", msg, lua_tostring(L, -1));
+-    //printf("%s: %s\n", msg, lua_tostring(L, -1));
+-}
++    // create a new state
++    lua_State *L = luaL_newstate();
++    if(L == NULL) {
++        write_log(_T("WARNING: can't create new lua state\n"));
++        return NULL;
++    }
+ 
+-void uae_lua_aquire_lock()
+-{
+-	uae_sem_wait (&lua_sem);
+-}
++    // setup state
++    luaL_openlibs(L);
++    setup_state(L);
++    if(g_extra_state_setup != NULL) {
++        g_extra_state_setup(L);
++    }
+ 
+-void uae_lua_release_lock()
+-{
+-	uae_sem_post (&lua_sem);
++    // find empty state slot
++    uae_sem_wait (&lua_sem);
++    uae_lua_state_t *state = g_free;
++    if(state == NULL) {
++        uae_sem_post (&lua_sem);
++        write_log(_T("WARNING: too many lua states (ignored this one)\n"));
++        return NULL;
++    }
++
++    // insert new state
++    g_free = state->next;
++    state->next = g_first;
++    state->state = L;
++    state->flags = flags;
++    g_first = state;
++    g_num_states ++;
++    uae_sem_post (&lua_sem);
++
++    write_log(_T("lua: created state %p (slot %p, num=%d)\n"),
++        L, state, g_num_states);
++    return L;
+ }
+ 
+-void uae_lua_run_handler(const char *name)
++void uae_lua_destroy_state(lua_State *L)
+ {
+-    lua_State **L = g_states;
+-    while(*L) {
+-        uae_lua_aquire_lock();
+-        lua_getglobal(*L, name);
+-        if (lua_isnil(*L, -1)) {
+-            //lua_pop(*L, 1);
+-        }
+-        else if (lua_pcall(*L, 0, 0, 0) != 0) {
+-            uae_lua_log_error(*L, name);
+-            //lua_pop(*L, 1);
++    // find slot
++    uae_sem_wait (&lua_sem);
++    uae_lua_state_t *slot = g_first;
++    uae_lua_state_t *last = NULL;
++    while(slot != NULL) {
++        if(slot->state == L) {
++            break;
+         }
+-        lua_settop(*L, 0);
+-        uae_lua_release_lock();
+-        L++;
++        last = slot;
++        slot = slot->next;
++    }
++    if(slot == NULL) {
++        uae_sem_post (&lua_sem);
++        write_log(_T("lua: can't destroy unknown state %p\n"), L);
++        return;
+     }
+-}
+ 
+-void uae_lua_load(const TCHAR *filename)
+-{
+-	char *fn;
+-	lua_State *L = luaL_newstate();
+-#ifdef FSUAE
++    // remove slot
++    if(slot == g_first) {
++        g_first = slot->next;
++    } else {
++        last->next = slot->next;
++    }
++    g_num_states --;
++    slot->next = g_free;
++    g_free = slot;
++    uae_sem_post (&lua_sem);
+ 
+-#else
+-	luaL_openlibs(L);
+-#endif
+-	fn = ua (filename);
+-	int err = luaL_loadfilex(L, fn, NULL);
+-	if (!err) {
+-		err = lua_pcall(L, 0, LUA_MULTRET, 0);
+-		if (!err) {
+-			write_log (_T("'%s' loaded\n"), filename);
+-			uae_lua_init_state (L);
+-		}
+-	}
+-	if (err)
+-		write_log (_T("'%s' initialization failed: %d\n"), err);
+-	xfree (fn);
++    // free state
++    lua_close(L);
++    write_log(_T("lua: destroyed state %p (slot %p, num=%d)\n"),
++        L, slot, g_num_states);
+ }
+ 
+-void uae_lua_loadall(void)
++void uae_lua_set_extra_state_setup(uae_lua_state_cb func)
+ {
+-	TCHAR tmp[MAX_DPATH];
+-	fetch_luapath (tmp, sizeof tmp / sizeof (TCHAR));
+-	_tcscat (tmp, _T("default.lua"));
+-	if (zfile_exists (tmp))
+-		uae_lua_load(tmp);
+-	for (int i = 0; i < MAX_LUA_STATES; i++) {
+-		if (currprefs.luafiles[i][0]) {
+-			uae_lua_load(currprefs.luafiles[i]);
+-		}
+-	}
++    g_extra_state_setup = func;
+ }
+ 
+-void uae_lua_init_state(lua_State *L)
++void uae_lua_set_callbacks(uae_lua_cb init_cb, uae_lua_cb exit_cb)
+ {
+-    write_log(_T("uae_lua_init_state %p\n"), L);
+-    if (g_num_states == MAX_LUA_STATES) {
+-        write_log(_T("WARNING: too many lua states (ignored this one)\n"));
+-        return;
+-    }
+-    g_states[g_num_states] = L;
+-    g_num_states++;
+-
+-    lua_register(L, "uae_log", l_uae_log);
+-
+-    lua_register(L, "uae_read_u8", l_uae_read_u8);
+-    lua_register(L, "uae_read_u16", l_uae_read_u16);
+-    lua_register(L, "uae_peek_u16", l_uae_peek_u16);
+-    lua_register(L, "uae_write_u8", l_uae_write_u8);
+-    lua_register(L, "uae_write_u16", l_uae_write_u16);
+-
+-	lua_register(L, "uae_read_config", l_uae_read_config);
+-	lua_register(L, "uae_write_config", l_uae_write_config);
+-
+-	for (int i = 0; custd[i].name; i++) {
+-		char *s = ua(custd[i].name);
+-		lua_pushinteger(L, custd[i].adr);
+-		lua_setglobal(L, s);
+-		xfree(s);
+-	}
++    g_init_cb = init_cb;
++    g_exit_cb = exit_cb;
+ }
+ 
+ void uae_lua_init(void)
+ {
+-	uae_sem_init (&lua_sem, 0, 1);
++    write_log(_T("lua: init\n"));
++
++    uae_sem_init (&lua_sem, 0, 1);
++
++    // init state slots
++    g_num_states = 0;
++    g_first = NULL;
++    g_free = g_states;
++    uae_lua_state_t *last = NULL;
++    uae_lua_state_t *current = g_states;
++    for(int i=0;i<MAX_LUA_STATES;i++) {
++        if(last != NULL) {
++            last->next = current;
++        }
++        current->next = NULL;
++        current->state = NULL;
++        current->flags = 0;
++        last = current;
++        current++;
++    }
++
++    // notify callback
++    if(g_init_cb != NULL) {
++        g_init_cb();
++    }
+ }
+ 
+ void uae_lua_free(void)
+ {
+-	for (int i = 0; i < g_num_states; i++) {
+-		lua_close(g_states[i]);
+-	}
+-	g_num_states = 0;
+-	uae_sem_destroy(&lua_sem);
++    write_log(_T("lua: free\n"));
++
++    // notify callback
++    if(g_exit_cb != NULL) {
++        g_exit_cb();
++    }
++
++    // free states in slots
++    uae_lua_state_t *current = g_first;
++    while(current != NULL) {
++        int flags = current->flags;
++        if(flags & UAE_LUA_STATE_AUTO_CLEAN) {
++            uae_lua_destroy_state(current->state);
++        } else {
++            write_log(_T("WARNING: state %p not auto clean but still there...\n"),
++                current->state);
++        }
++    }
++
++    uae_sem_destroy(&lua_sem);
+ }
+ 
+ #endif
+diff --git a/src/main.cpp b/src/main.cpp
+index b7dd5cf03..cac53a9f0 100644
+--- a/src/main.cpp
++++ b/src/main.cpp
+@@ -1025,7 +1025,7 @@ void do_start_program (void)
+ 	if (quit_program >= 0)
+ 		quit_program = UAE_RESET;
+ #ifdef WITH_LUA
+-	uae_lua_loadall ();
++	uae_lua_run_init_scripts ();
+ #endif
+ #ifdef USE_STRUCTURED_EXCEPTION_HANDLING
+ 	__try
+diff --git a/src/od-fs/include/uae/uae.h b/src/od-fs/include/uae/uae.h
+index 4c7e65eb1..922f31924 100644
+--- a/src/od-fs/include/uae/uae.h
++++ b/src/od-fs/include/uae/uae.h
+@@ -23,8 +23,15 @@ void amiga_on_restore_state_finished(uae_callback_function *function);
+ 
+ #ifdef WITH_LUA
+ #include <lauxlib.h>
+-void amiga_init_lua(void (*lock)(void), void (*unlock)(void));
+-void amiga_init_lua_state(lua_State *L);
++typedef void (*uae_lua_init_state_callback)(lua_State *L);
++void amiga_lua_init(void (*init)(void), void (*done)(void));
++void amiga_lua_set_extra_state_init(uae_lua_init_state_callback f);
++int amiga_lua_run_handler(const char *name);
++int amiga_lua_run_script(const char *path);
++lua_State *amiga_lua_create_state(void);
++void amiga_lua_destroy_state(lua_State *);
++void amiga_lua_lock_state(lua_State *);
++void amiga_lua_unlock_state(lua_State *);
+ #endif
+ 
+ #define AMIGA_FLOPPY_LIST_SIZE 20
+diff --git a/src/od-fs/libamiga.cpp b/src/od-fs/libamiga.cpp
+index 71bf451d2..71eb1f352 100644
+--- a/src/od-fs/libamiga.cpp
++++ b/src/od-fs/libamiga.cpp
+@@ -96,14 +96,44 @@ void amiga_set_save_state_compression(int compress) {
+ 
+ #ifdef WITH_LUA
+ 
+-void amiga_init_lua(void (*lock)(void), void (*unlock)(void)) {
+-    //uae_lua_init(lock, unlock);
+-    write_log("WARNING: not sending lock function to uae_lua_init\n");
+-    uae_lua_init();
++void amiga_lua_init(void (*bind)(void), void (*unbind)(void))
++{
++    uae_lua_set_callbacks(bind, unbind);
++}
++
++void amiga_lua_set_extra_state_init(uae_lua_init_state_callback f)
++{
++    uae_lua_set_extra_state_setup(f);
++}
++
++int amiga_lua_run_handler(const char *name)
++{
++    return uae_lua_run_handler(name);
++}
++
++int amiga_lua_run_script(const char *path)
++{
++    return uae_lua_run_script(path);
+ }
+ 
+-void amiga_init_lua_state(lua_State *L) {
+-    uae_lua_init_state(L);
++lua_State *amiga_lua_create_state(void)
++{
++    return uae_lua_create_state(0);
++}
++
++void amiga_lua_destroy_state(lua_State *state)
++{
++    uae_lua_destroy_state(state);
++}
++
++void amiga_lua_lock_state(lua_State *state)
++{
++    uae_lua_lock_state(state);
++}
++
++void amiga_lua_unlock_state(lua_State *state)
++{
++    uae_lua_unlock_state(state);
+ }
+ 
+ #endif
+diff --git a/src/od-fs/winuae_compat.h b/src/od-fs/winuae_compat.h
+index dd2841fe0..9ba4eb831 100644
+--- a/src/od-fs/winuae_compat.h
++++ b/src/od-fs/winuae_compat.h
+@@ -7,6 +7,7 @@
+ // later includes of windows.h
+ 
+ #include "windef.h"
++#include "winsock2.h"
+ #include "windows.h"
+ 
+ #endif
+diff --git a/tools/fs-uae-ctl b/tools/fs-uae-ctl
+new file mode 100755
+index 000000000..948d6e891
+--- /dev/null
++++ b/tools/fs-uae-ctl
+@@ -0,0 +1,121 @@
++#!/usr/bin/env python3
++#
++# fs-uae-ctl - a cli control tool for fs-uae
++
++import sys
++import os
++import argparse
++import fsuae
++
++usage="""
++Usage:
++
++ df[n]                show inserted floppy image file
++ df[n] <image_file>   insert an image file into floppy slot
++ df[n] eject          remove an image file from floppy slot
++
++ cd[n]                show inserted CDROM image file
++ cd[n] <image_file>   insert an image file into CDROM slot
++ cd[n] eject          remove an image file from CDROM slot
++"""
++
++def check_drive_name(s, drive_type):
++    if len(s) > 2 and s.startswith(drive_type):
++        num = s[2]
++        if num >= '0' and num <= '9':
++            return int(num)
++
++def handle_drive(emu, obj, slot, value, funcs):
++    name = obj[:3]
++    nd = funcs[0]() # getNumXDrives
++    if slot >= nd:
++        print(name,"not available")
++        return 2
++    if value is None:
++        img = funcs[1](slot) # getXImagePath
++        if img == "":
++            img = "empty"
++        print(name, img)
++    elif value == "eject":
++        funcs[2](slot, "") # setXImagePath
++    else:
++        # check for file
++        if not os.path.isfile(value):
++            print(value, "does not exist!")
++            return 3
++        funcs[2](slot, value) # setXImagePath
++    return 0
++
++def handle_command(emu, obj, val):
++    if obj is None:
++        print("no object given")
++        return
++    # check for floppy
++    n = check_drive_name(obj, "df")
++    if n is not None:
++        f = (emu.getNumFloppyDrives,
++             emu.getFloppyImagePath,
++             emu.setFloppyImagePath)
++        handle_drive(emu, obj, n, val, f)
++    else:
++        # check for CDROM
++        n = check_drive_name(obj, "cd")
++        if n is not None:
++            f = (emu.getNumCDROMDrives,
++                 emu.getCDROMImagePath,
++                 emu.setCDROMImagePath)
++            handle_drive(emu, obj, n, val, f)
++        else:
++            # invalid
++            print("invalid command!")
++
++def command_loop(emu):
++    while True:
++        line = input('> ')
++        parts = line.split()
++        if len(parts) == 2:
++            handle_command(emu, parts[0], parts[1])
++        elif len(parts) == 1:
++            cmd = parts[0]
++            if cmd in ('quit', 'exit'):
++                break
++            else:
++                handle_command(emu, cmd, None)
++        else:
++            print("syntax error")
++
++def main(args):
++    p = argparse.ArgumentParser(
++            description="Remote control FS-UAE via the lua shell interface",
++            formatter_class=argparse.RawDescriptionHelpFormatter,
++            epilog=usage)
++    p.add_argument('obj', nargs='?', help='floppy dfx: or cdrom cdx: drive')
++    p.add_argument('val', nargs='?', help='drive image file or "eject"')
++    p.add_argument('--host', '-H', help="lua shell host address", default="localhost")
++    p.add_argument('--port', '-P', help="lua shell port", type=int, default=6800)
++    p.add_argument('--interactive', '-i', help="enter commands", action='store_true')
++    r = p.parse_args(args[1:])
++    obj = r.obj
++    val = r.val
++
++    # open shell
++    emu = fsuae.Emu()
++    if not emu.connect(host=r.host, port=r.port):
++        print(emu.getError())
++        return 1
++
++    try:
++        # interactive mode
++        if r.interactive:
++            command_loop(emu)
++        # direct command
++        else:
++            handle_command(emu, obj, val)
++    except fsuae.LuaShellError as e:
++        print(e.msg)
++
++    emu.disconnect()
++
++if __name__ == '__main__':
++    res = main(sys.argv)
++    sys.exit(res)
+\ No newline at end of file
+diff --git a/tools/fs-uae-ctl-ui b/tools/fs-uae-ctl-ui
+new file mode 100755
+index 000000000..0781fb80b
+--- /dev/null
++++ b/tools/fs-uae-ctl-ui
+@@ -0,0 +1,185 @@
++#!/usr/bin/env python3
++
++import sys
++import os
++from PyQt4 import QtCore, QtGui
++import fsuae
++
++class DriveSelector(QtGui.QWidget):
++
++    error = QtCore.pyqtSignal('QString')
++
++    def __init__(self, name, funcs, slot, settings, filt, *args):
++        self.name = name
++        self.get_func = funcs[0]
++        self.set_func = funcs[1]
++        self.slot = slot
++        self.filt = filt
++        self.settings = settings
++        QtGui.QWidget.__init__(self, *args)
++        self.label = QtGui.QLabel(name, self)
++        self.input = QtGui.QLineEdit(self)
++        self.pick = QtGui.QPushButton("...", self)
++        self.eject = QtGui.QPushButton("\u23cf", self)
++        self.pick.setMaximumWidth(32)
++        self.eject.setMaximumWidth(32)
++        layout = QtGui.QHBoxLayout()
++        layout.setSpacing(2)
++        layout.setMargin(2)
++        layout.addWidget(self.label,0,QtCore.Qt.AlignLeft)
++        layout.addWidget(self.input,1)
++        layout.addWidget(self.pick)
++        layout.addWidget(self.eject)
++        self.setLayout(layout)
++        # connects
++        self.eject.clicked.connect(self.onEject)
++        self.pick.clicked.connect(self.onPick)
++
++    def get_name(self):
++        return self.name
++
++    def setEnabled(self, on):
++        self.input.setEnabled(on)
++        self.pick.setEnabled(on)
++        self.eject.setEnabled(on)
++
++    def updatePath(self):
++        try:
++            path = self.get_func(self.slot)
++            self.input.setText(path)
++        except fsuae.LuaShellError as e:
++            self.error.emit(e.msg)
++
++    @QtCore.pyqtSlot()
++    def onEject(self):
++        try:
++            self.set_func(self.slot, "")
++            self.input.setText("")
++        except fsuae.LuaShellError as e:
++            self.error.emit(e.msg)
++
++    @QtCore.pyqtSlot()
++    def onPick(self):
++        key = self.name + "/dir"
++        dir_path = self.settings.value(key)
++        path = QtGui.QFileDialog.getOpenFileName(self, "Pick Image", dir_path, self.filt)
++        if path != "":
++            dir_path = os.path.dirname(path)
++            self.settings.setValue(key, dir_path)
++            try:
++                self.set_func(self.slot, path)
++                self.input.setText(path)
++            except fsuae.LuaShellError as e:
++                self.error.emit(e.msg)
++
++
++class UIWindow(QtGui.QMainWindow):
++    def __init__(self, emu, *args):
++        QtGui.QMainWindow.__init__(self, *args)
++        self.emu = emu
++        self.floppy_widgets = [None] * 4
++        self.cdrom_widgets = [None] * 4
++        self._create_widgets()
++
++    def _create_widgets(self):
++        tab = self._create_tab()
++        self.setCentralWidget(tab)
++
++        # tool bar
++        tb = QtGui.QToolBar("Tools")
++        self.addToolBar(tb)
++        action = tb.addAction("Connect")
++        action.triggered.connect(self.onConnect)
++
++        # status bar
++        self.status = QtGui.QStatusBar()
++        self.setStatusBar(self.status)
++        self.status.showMessage("Ready.")
++
++    def _create_tab(self):
++        w = QtGui.QTabWidget()
++        settings = QtCore.QSettings("FS-UAE", "fs-uae-ctl-ui")
++
++        # floppies tab
++        fw = QtGui.QWidget()
++        w.addTab(fw, "Floppies")
++        l = QtGui.QVBoxLayout()
++        l.setSpacing(0)
++        fw.setLayout(l)
++        floppy_filter = "ADF Image (*.adf);;All Files (*.*)"
++        for i in range(len(self.floppy_widgets)):
++            t = "df{}:".format(i)
++            funcs = (self.emu.getFloppyImagePath,
++                     self.emu.setFloppyImagePath)
++            f = DriveSelector(t, funcs, i, settings, floppy_filter, fw)
++            f.error.connect(self.onError)
++            f.setEnabled(False)
++            l.addWidget(f)
++            self.floppy_widgets[i] = f
++
++        # CDROMs tab
++        fc = QtGui.QWidget()
++        w.addTab(fc, "CDROMs")
++        l = QtGui.QVBoxLayout()
++        l.setSpacing(0)
++        fc.setLayout(l)
++        cdrom_filter = "CDROM Image (*.iso *.img);;All Files (*.*)"
++        for i in range(len(self.cdrom_widgets)):
++            t = "cd{}:".format(i)
++            funcs = (self.emu.getCDROMImagePath,
++                     self.emu.setCDROMImagePath)
++            f = DriveSelector(t, funcs, i, settings, cdrom_filter, fc)
++            f.error.connect(self.onError)
++            f.setEnabled(False)
++            l.addWidget(f)
++            self.cdrom_widgets[i] = f
++
++        return w
++
++    def setEnabled(self, num_floppies=0, num_cdroms=0):
++        self.num_floppies = num_floppies
++        i = 0
++        for f in self.floppy_widgets:
++            f.setEnabled(i < num_floppies)
++            i += 1
++
++        self.num_cdroms = num_cdroms
++        i = 0
++        for c in self.cdrom_widgets:
++            c.setEnabled(i < num_cdroms)
++            i += 1
++
++    @QtCore.pyqtSlot()
++    def onConnect(self):
++        if self.emu.isConnected():
++            self.emu.disconnect()
++
++        ok = self.emu.connect()
++        if ok:
++            nf = self.emu.getNumFloppyDrives()
++            nc = self.emu.getNumCDROMDrives()
++            self.status.showMessage("Connected: #{} floppies, #{} cdroms".format(nf,nc));
++            self.setEnabled(nf, nc)
++            for f in range(nf):
++                self.floppy_widgets[f].updatePath()
++            for c in range(nc):
++                self.cdroms_widgets[c].updatePath()
++        else:
++            self.status.showMessage("Not Connected: " + self.emu.getError())
++
++    @QtCore.pyqtSlot(str)
++    def onError(self, msg):
++        self.status.showMessage("Disconnected: " + msg)
++        self.emu.disconnect()
++        self.setEnabled()
++
++
++def main(args):
++    emu=fsuae.Emu()
++    app=QtGui.QApplication(args)
++    win=UIWindow(emu)
++    win.show()
++    sys.exit(app.exec_())
++
++if __name__=="__main__":
++    main(sys.argv)
+diff --git a/tools/fsuae/__init__.py b/tools/fsuae/__init__.py
+new file mode 100644
+index 000000000..c4daf4e46
+--- /dev/null
++++ b/tools/fsuae/__init__.py
+@@ -0,0 +1,3 @@
++from .luashell import LuaShell, LuaShellError
++from .drives import Floppies, CDROMs
++from .emu import Emu
+diff --git a/tools/fsuae/drives.py b/tools/fsuae/drives.py
+new file mode 100644
+index 000000000..951f487c4
+--- /dev/null
++++ b/tools/fsuae/drives.py
+@@ -0,0 +1,59 @@
++class Drives:
++    """binding for floppy and cdrom drives interface"""
++    def __init__(self, lua_shell, drive_type):
++        self._sh = lua_shell
++        self._type = drive_type
++        self._num_drives = 0
++        self._images = []
++        self._prefix = "fsuae." + self._type
++
++    def set_shell(self, sh):
++        self._sh = sh
++
++    def _quote_lua_string(self, s):
++        s = s.replace('"','\\"')
++        return '"' + s + '"'
++
++    def get_num_drives(self):
++        """get the number of enabled drives"""
++        cmd = "={}.get_num_drives()".format(self._prefix)
++        res = self._sh.execute(cmd,1)
++        return int(res[0])
++
++    def get_image_file(self, slot):
++        """get the attached image file"""
++        cmd = "={}.get_file({})".format(self._prefix, slot)
++        res = self._sh.execute(cmd,1)
++        path = res[0]
++        return path
++
++    def set_image_file(self, slot, path):
++        """set the image file"""
++        cmd = "{}.set_file({},{})".format(self._prefix,
++                    slot, self._quote_lua_string(path))
++        self._sh.execute(cmd,0)
++
++    def dump(self):
++        """dump state"""
++        n = self.get_num_drives()
++        print(self._type,"#",n)
++        for i in range(n):
++            print(self.get_image_file(i))
++
++class Floppies(Drives):
++    def __init__(self, lua_shell):
++        Drives.__init__(self, lua_shell, "floppy")
++
++class CDROMs(Drives):
++    def __init__(self, lua_shell):
++        Drives.__init__(self, lua_shell, "cdrom")
++
++# quick test
++if __name__ == '__main__':
++    from luashell import LuaShell
++    sh = LuaShell()
++    sh.connect()
++    f = Floppies(sh)
++    f.dump()
++    c = CDROMs(sh)
++    c.dump()
+diff --git a/tools/fsuae/emu.py b/tools/fsuae/emu.py
+new file mode 100644
+index 000000000..d830ba9a9
+--- /dev/null
++++ b/tools/fsuae/emu.py
+@@ -0,0 +1,74 @@
++from .luashell import LuaShell, LuaShellError
++from .drives import CDROMs, Floppies
++
++class Emu:
++    def __init__(self):
++        self.sh = None
++        self.connected = False
++        self.floppies = None
++        self.cdroms = None
++        self.error = None
++
++    def connect(self, host="localhost", port=6800):
++        if self.connected:
++            return
++        try:
++            self.sh = LuaShell(host, port)
++            self.sh.connect()
++            self.floppies = Floppies(self.sh)
++            self.cdroms = CDROMs(self.sh)
++            self.num_floppies = self.floppies.get_num_drives()
++            self.num_cdroms = self.cdroms.get_num_drives()
++            self.connected = True
++            self.error = None
++            return True
++        except LuaShellError as e:
++            self.error = "LuaShellError: " + e.msg
++            return False
++
++    def disconnect(self):
++        if not self.connected:
++            return
++        try:
++            self.sh.disconnect()
++            self.sh = None
++            self.floppies = None
++            self.drives = None
++            self.connected = False
++            return True
++        except LuaShellError as e:
++            self.error = "LuaShellError: " + e.msg
++            return False
++
++    def isConnected(self):
++        return self.connected
++
++    def getError(self):
++        return self.error
++
++    def getNumFloppyDrives(self):
++        return self.num_floppies
++
++    def getNumCDROMDrives(self):
++        return self.num_cdroms
++
++    def getFloppyImagePath(self, slot):
++        return self.floppies.get_image_file(slot)
++
++    def setFloppyImagePath(self, slot, path):
++        self.floppies.set_image_file(slot, path)
++
++    def getCDROMImagePath(self, slot):
++        return self.cdroms.get_image_file(slot)
++
++    def setCDROMImagePath(self, slot, path):
++        self.cdroms.set_image_file(slot, path)
++
++
++if __name__ == '__main__':
++    emu = Emu()
++    if not emu.connect():
++        print("ERROR", emu.getError())
++    else:
++        print("Drives", emu.getNumDrives())
++        emu.disconnect()
+diff --git a/tools/fsuae/luashell.py b/tools/fsuae/luashell.py
+new file mode 100644
+index 000000000..2f283e142
+--- /dev/null
++++ b/tools/fsuae/luashell.py
+@@ -0,0 +1,102 @@
++
++import socket
++import re
++
++class LuaShellError(Exception):
++    def __init__(self, msg):
++        self.msg = msg
++
++class LuaShell:
++    """helper class to access FS-UAE via the lua shell"""
++    prompt = '> '
++
++    def __init__(self, host="localhost", port=6800):
++        self._host = host
++        self._port = port
++        self._socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
++        self._socket.settimeout(1)
++        self._fsuae_ver = None
++        self._lua_ver = None
++
++    def connect(self):
++        try:
++            self._socket.connect((self._host, self._port))
++            # read and parse header
++            header = self._socket.recv(80)
++            header = header.decode('utf-8').strip()
++            m = re.search("FS-UAE (\S+) Lua (\S+)", header)
++            if m is None:
++                raise LuaShellError("Invalid Header: " + header)
++            self._fsuae_ver = m.group(1)
++            self._lua_ver = m.group(2)
++            # read prompt
++            prompt = self._socket.recv(80)
++            prompt = prompt.decode('utf-8')
++            if prompt != self.prompt:
++                raise LuaShellError("Invalid Prompt: " + prompt)
++        except IOError as e:
++            raise LuaShellError("IO Error: "+str(e))
++        except socket.timeout:
++            raise LuaShellError("Timeout")
++
++    def disconnect(self):
++        try:
++            self._socket.shutdown(socket.SHUT_RDWR)
++        except IOError as e:
++            pass
++        except socket.timeout:
++            pass
++        self._socket = None
++        self._fsuae_ver = None
++        self._lua_ver = None
++
++    def get_versions(self):
++        return (self._fsuae_ver, self._lua_ver)
++
++    def execute(self, cmd, num_res=-1):
++        try:
++            cmd += '\r\n'
++            buf = cmd.encode('utf-8')
++            self._socket.sendall(buf)
++            # read result
++            result = ""
++            while True:
++                line = self._socket.recv(1024)
++                if line == b'':
++                    raise LuaShellError("Connection lost")
++                result += line.decode('utf-8')
++                # prompt at end?
++                lp = len(self.prompt)
++                if len(result) >= lp:
++                    end = result[-lp:]
++                    if end == self.prompt:
++                        result = result[:-lp]
++                        break
++            # split lines
++            lines = result.split('\n')[:-1]
++            lres = []
++            for l in lines:
++                lres.append(l.replace('\r',''))
++            # got an error?
++            if len(lres) == 1 and lres[0].startswith('ERROR:'):
++                raise LuaShellError(lres[0])
++            # check result
++            if num_res >= 0:
++                if len(lres) != num_res:
++                    raise LuaShellError("Wrong number of result lines: "+num_res)
++            # return result
++            return lres
++        except IOError as e:
++            raise LuaShellError("IO Error: "+str(e))
++        except socket.timeout:
++            raise LuaShellError("Timeout")
++
++# quick shell test
++if __name__ == '__main__':
++    sh = LuaShell()
++    sh.connect()
++    # eval command
++    res = sh.execute('=3+2',1)
++    print(res)
++    # raise error
++    res = sh.execute('=2+')
