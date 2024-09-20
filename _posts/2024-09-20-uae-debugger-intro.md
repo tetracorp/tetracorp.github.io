@@ -94,6 +94,21 @@ parameter is the number of lines at 16 bytes per line.
 
 Memory dump, but show the bytes decoded as 68k assembly instructions.
 
+#### S - Save
+
+Uppercase `S`. Save an area of Amiga memory to a file. You can dump the whole of
+RAM for later analysis in a hex editor, or save a section (e.g. if you have
+identified which parts of memory code for certain parts of the game state).
+
+Parameters are the filename, start address, and length. For example, if I know
+Ratt's character data starts at 0x18dd0 is 466 bytes (0x1d2 hex) long:
+
+    S ratt $18dd0 $1d2
+
+Or dump all 1MB RAM:
+
+    S dump1 $0 $100000
+
 #### w - Watch
 
 Lowercase "w" sets a watchpoint at memory. The program will automatically stop
@@ -116,7 +131,8 @@ To clear the watchpoint, just set it with no parameters:
     w 1
 
 If you're writing your own assembly language program, one way to trigger the
-debugger intentionally is to write it, like so:
+debugger intentionally is to access an area of RAM for the debugger to watch,
+like so:
 
     clr.w $100
 

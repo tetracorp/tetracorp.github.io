@@ -80,22 +80,22 @@ fsemu.set_shader()
 : 
 
 fsuae.cdrom.get_file(filename)
-:
+: 
 
 fsuae.cdrom.get_num_drives()
-:
+: 
 
 fsuae.cdrom.set_file(filename)
-:
+: 
 
 fsuae.floppy.get_file(filename)
-:
+: 
 
 fsuae.floppy.get_num_drives()
-:
+: 
 
 fsuae.floppy.set_file(filename)
-:
+: 
 
 fsuae.get_input_event()
 : 
@@ -148,7 +148,7 @@ quit()
 #### Tables
 
 uae.custom
-: A table of the custom chip registers and their memory locations. For example:
+: A table of the custom chip registers and their memory locations. For example: 
 
     print(string.format("$%x",uae.peek_u16(uae.custom['COLOR01'])))
 
@@ -182,9 +182,14 @@ will dump the current palette:
 
     for n=0,31 do print(string.format("COLOR%02d: $%03x",n,uae.peek_u16(uae.custom['COLOR00']+n*2))) end
 
-You can track variables which aren't normally displayed on screen. For example,
-put this in `default.lua` to show whenever the first character gains XP to the
-Adventurer class in Knightmare:
+Unlike the real Lua interpreter, it doesn't allow you to spread over multiple
+lines. You will have to use semicolons to divide statements. It's also less
+fully featured than actual Lua; e.g. you can't `require()` external modules, and
+the bitwise shift operators `<<` and `>>` are missing.
+
+Another use of the Lua interface is to track variables which aren't normally
+displayed on screen. For example, put this in `default.lua` to show whenever the
+first character gains XP to the Adventurer class in _Knightmare_:
 
     xp = 0
     function on_uae_vsync()
@@ -201,7 +206,7 @@ such as a character name or player 2 score readout.
 
 A limitation is that you can only read memory and custom registers, not data or
 address registers. For more specific abilities, use the
-[FS-UAE debugger](../guide/uae-debugger-info.html).
+[FS-UAE debugger](../guide/uae-debugger-intro.html).
 
 See also
 [cnvogelg's tools](https://github.com/cnvogelg/fs-uae/tree/lua/tools),
