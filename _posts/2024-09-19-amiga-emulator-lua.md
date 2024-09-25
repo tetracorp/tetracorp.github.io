@@ -163,7 +163,7 @@ on_fs_emu_render_frame()
 on_fs_uae_input_event
 : 
 
-on_fs_uae_load_state, on_fs_uae_save_state, on_fs_uae_load_state_done, on_fs_uae_save_state_done
+on_fs_uae_load_state()<br>on_fs_uae_save_state()<br>on_fs_uae_load_state_done()<br>on_fs_uae_save_state_done()
 : Called whenever you load or save a save state.
 
 on_fs_uae_read_input
@@ -204,8 +204,25 @@ A script like this prints to stdout (i.e. the terminal you launched fs-uae
 from), but you could also display data by writing it to some on-screen value,
 such as a character name or player 2 score readout.
 
-A limitation is that you can only read memory and custom registers, not data or
-address registers. For more specific abilities, use the
+The following useful snippet can be pasted into the telnet to report ongoing
+changes within a certain memory area, as defined by `start` and `finish`. It
+also defines some handy shortcut functions: `W(addr, value)` to write a two-byte
+value, and `A(addr,value)` to add a number to a value.
+
+    start = 0x18dd0 ; finish = 0x18fa2
+    d = {} ; for n=start,finish,2 do d[n]=0 end
+    function hex(n) return (string.format("$%04x",n)) end
+    function W(addr,value) uae.write_u16(addr,value) end
+    function A(addr,value) uae.write_u16(addr,uae.peek_u16(addr)+value) end
+    function u() for addr,v in pairs(d) do c = uae.peek_u16(addr) ; if not (v==c) then print(hex(addr), hex(v), hex(c), pl(c-v)) ; d[addr] = c ; end end end
+    u()
+    function on_uae_vsync() u() end
+
+Using the terminal interface, there's a limit to how long you can make one line,
+and you can't enter a function over multiple lines. Another limitation is that
+you can only read memory and custom registers, not data or address registers.
+For more specific abilities, including search, reading and setting registers,
+and setting watchpoints, use the
 [FS-UAE debugger](../guide/uae-debugger-intro.html).
 
 See also
