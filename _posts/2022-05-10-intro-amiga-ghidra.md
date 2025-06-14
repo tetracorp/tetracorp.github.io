@@ -66,7 +66,7 @@ file. Select "Yes", but be careful with your options:
 - Non-Returning Functions: Untick this too, for the same reason as Call-Fixup
 - Reference: Untick "Unicode String References".
 
-If you chose not to run auto-analysis, don't worry, as you can re-reun it at any
+If you chose not to run auto-analysis, don't worry, as you can re-run it at any
 time from the CodeBrowser window menu Analysis - Auto Analyze 'programname'...
 option. You can also individually run features in Analysis - One Shot, such as
 Aggressive Instruction Finder.
@@ -140,7 +140,7 @@ are the parameters used that instruction. For example:
 
 At this point, it becomes very useful to learn 68k Assembly language, if you
 aren't already familiar with it. Learning 68k is too big a topic to cover in
-this article, but there are numerous tutorials ande guides. I recommend 
+this article, but there are numerous tutorials and guides. I recommend 
 [MarkyJester's 68k Tutorial](https://mrjester.hapisan.com/04_MC68/). You can use
 a program like Easy68k (Windows) to play around with 68k to get an intuitive
 sense of how 68k instructions work.
@@ -155,7 +155,7 @@ To the right of the Listing panel is the Decompile panel, which will attempt to
 translate the current section into C. This is a more high-level language, so it
 may be easier for you to interpret, especially if you're unfamiliar with
 Assembly. However, since most Amiga games were written in Assembly and not C,
-it will not always interpet meaingfully or correctly. You therefore can't rely
+it will not always interpet meaningfully or correctly. You therefore can't rely
 on it all the time.
 
 ### Controls
@@ -344,12 +344,12 @@ simply hit T on the starting blueprint table variable and set it to
 `Blueprint[6][4]`. If you don't need an enum in this case, you could use
 `byte[6][4]`.
 
-If you accidentally give two things the same name, Ghidra will contine to track
+If you accidentally give two things the same name, Ghidra will continue to track
 them correctly and won't confuse the two.
 
 ### Other advice and methods
 
-You will sometimes seee references to fixed memory addresses like `DFF006`:
+You will sometimes see references to fixed memory addresses like `DFF006`:
 
 ```
 0201a6c8 31 79 02        move.w     (data315E8).l,(offset DAT_00dff0d6,A0)
@@ -362,7 +362,7 @@ You will sometimes seee references to fixed memory addresses like `DFF006`:
 
 These are Amiga hardware addresses. You can import them using the
 `ImportSymbolsScript.py` from [this file](../tools/ghidra-amiga-symbols.txt).
-These hardware addresses are often a really good way to identify whch parts of
+These hardware addresses are often a really good way to identify which parts of
 code are dealing with key system functions like graphics, sound, or input.
 For more detail on their meaning, see 
 [Mapping the Amiga](https://textfiles.meulie.net/programming/AMIGA/mapamiga.txt)

@@ -6,7 +6,7 @@ categories: guide
 FS-UAE began adding an experimental Lua scripting layer around 2013, although it
 is incomplete, disabled by default, and almost completely undocumented.
 Fortunately, it's possible to re-enable it and use it to write scripts to aid in
-the real-time analyis of Amiga software... or just to cheat at games.
+the real-time analysis of Amiga software... or just to cheat at games.
 
 ### Building FS-UAE with Lua
 

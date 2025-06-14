@@ -102,7 +102,7 @@ second is `$0000 0001`, and so on.
 
 Any line in a program can be prefixed with a label, which can be used throughout
 the program as a convenient synonym for that location in memory. This works much
-like variable names in high-level langauges. For example:
+like variable names in high-level languages. For example:
 
 ```
 START:
@@ -476,8 +476,8 @@ the last JSR or BSR left off.
 Set byte to "true" if condition code is true, "false" otherwise. In this case,
 setting a byte to "true" means setting all its bits to a 1, which is also
 equivalent to 255 unsigned or -1 signed; false sets all bits to 0, meaning 0.
-The counterintuitive result, then is that true and false are -1 and 0 instead of
-1 and 0.
+The counter-intuitive result, then is that true and false are -1 and 0 instead
+of 1 and 0.
 
 You will often see this as `ST` or `SF` (set if true / set if false). ST always
 sets the byte to true, i.e. all bits set to 1. SF always sets the byte to false,

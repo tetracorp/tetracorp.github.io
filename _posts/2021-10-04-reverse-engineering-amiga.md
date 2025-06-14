@@ -127,9 +127,9 @@ further. Here are some things to look for:
 - Standard Amiga library calls: Text strings in the game may reference library
   files, such as `graphics.library` or `dos.library`. Early on in a program you
   will see references to ABSEXECBASE ($4) followed by a jump to an offset; e.g.
-  `JSR (-30,A6)`. Calls to ABSEXECBASE are offets of `exec.library`, and you
+  `JSR (-30,A6)`. Calls to ABSEXECBASE are offsets of `exec.library`, and you
   will often see this to load other libraries with the OpenLibrary function,
-  i.e. `JSR (-552,A6)`. A fullly documented list of major library offsets and
+  i.e. `JSR (-552,A6)`. A fully documented list of major library offsets and
   hardware registers appears in
   [Mapping the Amiga](https://textfiles.meulie.net/programming/AMIGA/mapamiga.txt).
 - File read: Calls to `dos.library` functions Open `JSR (-30,An)` and
